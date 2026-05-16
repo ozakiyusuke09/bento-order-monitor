@@ -13,6 +13,8 @@ create table if not exists orders (
   note text,
   source text not null default 'manual',
   created_by uuid references auth.users(id),
+  deleted_at timestamptz,
+  deleted_by uuid references auth.users(id),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

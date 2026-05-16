@@ -23,6 +23,8 @@ function orderByPickup(a: OrderWithRelations, b: OrderWithRelations) {
 function normalizeOrder(row: any): OrderWithRelations {
   return {
     ...row,
+    deleted_at: row.deleted_at ?? null,
+    deleted_by: row.deleted_by ?? null,
     items: row.order_items ?? row.items ?? [],
     attachments: row.order_attachments ?? row.attachments ?? [],
     status_logs: row.status_logs ?? []
@@ -86,6 +88,7 @@ export async function getOrdersByDate(date: string) {
       .from("orders")
       .select("*, order_items(*), order_attachments(*), status_logs(*)")
       .eq("pickup_date", date)
+      .is("deleted_at", null)
       .order("pickup_time", { ascending: true });
 
     if (error) throw error;
@@ -93,7 +96,7 @@ export async function getOrdersByDate(date: string) {
   }
 
   return readMockOrders()
-    .filter((order) => order.pickup_date === date)
+    .filter((order) => order.pickup_date === date && !order.deleted_at)
     .sort(orderByPickup);
 }
 
@@ -103,6 +106,7 @@ export async function getFutureOrders(fromDate = todayString()) {
       .from("orders")
       .select("*, order_items(*), order_attachments(*), status_logs(*)")
       .gt("pickup_date", fromDate)
+      .is("deleted_at", null)
       .order("pickup_date", { ascending: true })
       .order("pickup_time", { ascending: true });
 
@@ -111,7 +115,7 @@ export async function getFutureOrders(fromDate = todayString()) {
   }
 
   return readMockOrders()
-    .filter((order) => order.pickup_date > fromDate)
+    .filter((order) => order.pickup_date > fromDate && !order.deleted_at)
     .sort(orderByPickup);
 }
 
@@ -120,7 +124,7 @@ export async function getPastOrders(beforeDate = todayString()) {
     const { data, error } = await supabase
       .from("orders")
       .select("*, order_items(*), order_attachments(*), status_logs(*)")
-      .lt("pickup_date", beforeDate)
+      .or(`pickup_date.lt.${beforeDate},deleted_at.not.is.null`)
       .order("pickup_date", { ascending: false })
       .order("pickup_time", { ascending: true });
 
@@ -129,7 +133,7 @@ export async function getPastOrders(beforeDate = todayString()) {
   }
 
   return readMockOrders()
-    .filter((order) => order.pickup_date < beforeDate)
+    .filter((order) => order.pickup_date < beforeDate || Boolean(order.deleted_at))
     .sort(orderByPickup);
 }
 
@@ -190,6 +194,8 @@ export async function createOrder(input: CreateOrderInput) {
     status,
     source,
     created_by: null,
+    deleted_at: null,
+    deleted_by: null,
     created_at: now,
     updated_at: now,
     ...input.order,
@@ -218,6 +224,38 @@ export async function createOrder(input: CreateOrderInput) {
 
   writeMockOrders([...readMockOrders(), order]);
   return id;
+}
+
+export async function softDeleteOrder(order: OrderWithRelations) {
+  if (order.deleted_at) return;
+  const now = new Date().toISOString();
+
+  if (hasSupabaseEnv && supabase) {
+    const { data: userData } = await supabase.auth.getUser();
+    const changedBy = userData.user?.id ?? null;
+
+    const { error: updateError } = await supabase
+      .from("orders")
+      .update({ deleted_at: now, deleted_by: changedBy, updated_at: now })
+      .eq("id", order.id);
+    if (updateError) throw updateError;
+
+    const { error: logError } = await supabase.from("status_logs").insert({
+      order_id: order.id,
+      old_status: order.status,
+      new_status: order.status,
+      changed_by: changedBy,
+      note: "削除"
+    });
+    if (logError) throw logError;
+    return;
+  }
+
+  writeMockOrders(
+    readMockOrders().map((current) =>
+      current.id === order.id ? { ...current, deleted_at: now, deleted_by: null, updated_at: now } : current
+    )
+  );
 }
 
 export async function updateOrderStatus(order: OrderWithRelations, newStatus: OrderStatus) {
@@ -310,6 +348,7 @@ export async function addAttachment(orderId: string, file: File) {
 }
 
 export function summarizeOrders(orders: OrderWithRelations[]): DashboardStats {
+  const activeOrders = orders.filter((order) => !order.deleted_at);
   const statusCounts: DashboardStats["statusCounts"] = {
     new: 0,
     confirmed: 0,
@@ -321,7 +360,7 @@ export function summarizeOrders(orders: OrderWithRelations[]): DashboardStats {
   let attachmentCount = 0;
   let deliveryCount = 0;
 
-  for (const order of orders) {
+  for (const order of activeOrders) {
     statusCounts[order.status] += 1;
     attachmentCount += order.attachments.length;
     if (order.receive_type === "delivery") deliveryCount += 1;
@@ -344,5 +383,7 @@ export function summarizeOrders(orders: OrderWithRelations[]): DashboardStats {
 }
 
 export function summarizeRemainingOrders(orders: OrderWithRelations[]): DashboardStats {
-  return summarizeOrders(orders.filter((order) => order.status !== "completed" && order.status !== "cancelled"));
+  return summarizeOrders(
+    orders.filter((order) => !order.deleted_at && order.status !== "completed" && order.status !== "cancelled")
+  );
 }

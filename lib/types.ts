@@ -17,6 +17,8 @@ export type Order = {
   note: string | null;
   source: OrderSource | string;
   created_by: string | null;
+  deleted_at: string | null;
+  deleted_by: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -60,7 +62,7 @@ export type OrderWithRelations = Order & {
 };
 
 export type CreateOrderInput = {
-  order: Omit<Order, "id" | "status" | "created_at" | "updated_at" | "created_by" | "source"> & {
+  order: Omit<Order, "id" | "status" | "deleted_at" | "deleted_by" | "created_at" | "updated_at" | "created_by" | "source"> & {
     status?: OrderStatus;
     source?: OrderSource;
   };
