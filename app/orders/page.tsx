@@ -10,7 +10,7 @@ import { OrderList } from "@/components/order-list";
 import { ProductTotals } from "@/components/product-totals";
 import { SummaryStrip } from "@/components/summary-strip";
 import { receiveTypeLabels, statusLabels } from "@/lib/constants";
-import { summarizeOrders, summarizeRemainingOrders } from "@/lib/order-store";
+import { summarizeOrders, summarizeRemainingOrders, updateOrderStatus } from "@/lib/order-store";
 import { useOrders, type OrdersMode } from "@/hooks/use-orders";
 import { displayDate, todayString, tomorrowString } from "@/lib/date";
 import type { OrderStatus } from "@/lib/types";
@@ -28,6 +28,7 @@ export default function OrdersPage() {
   const [selectedDate, setSelectedDate] = useState(today);
   const [mode, setMode] = useState<OrdersMode>("date");
   const [activeFilter, setActiveFilter] = useState<ActiveFilter>(null);
+  const [bulkCancelling, setBulkCancelling] = useState(false);
   const { orders, loading, error, refresh } = useOrders(selectedDate, mode);
   const stats = summarizeOrders(orders);
   const remainingStats = summarizeRemainingOrders(orders);
@@ -67,6 +68,25 @@ export default function OrdersPage() {
     if (activeFilter.type === "status") return orders.filter((order) => order.status === activeFilter.value);
     return orders.filter((order) => order.receive_type === activeFilter.value);
   }, [activeFilter, orders]);
+  const cancellableOrders = filteredOrders.filter((order) => order.status !== "completed" && order.status !== "cancelled");
+
+  async function cancelVisibleOrders() {
+    if (cancellableOrders.length === 0) return;
+    const ok = window.confirm(
+      `表示中の未完了注文 ${cancellableOrders.length} 件をキャンセルにします。\nこれから作る分・商品別合計から外れます。\nよろしいですか？`
+    );
+    if (!ok) return;
+
+    setBulkCancelling(true);
+    try {
+      await Promise.all(cancellableOrders.map((order) => updateOrderStatus(order, "cancelled")));
+      await refresh();
+    } catch (caught) {
+      window.alert(caught instanceof Error ? caught.message : "一括キャンセルに失敗しました。");
+    } finally {
+      setBulkCancelling(false);
+    }
+  }
 
   const baseHref = mode === "future" ? "/orders?view=reservations" : mode === "past" ? "/orders?view=history" : `/orders?date=${selectedDate}`;
   const headingLabel = mode === "future" ? "予約一覧" : mode === "past" ? "履歴" : "注文一覧";
@@ -132,6 +152,25 @@ export default function OrdersPage() {
                 <X className="h-4 w-4" />
                 全件表示
               </a>
+            </div>
+          ) : null}
+
+          {cancellableOrders.length > 0 ? (
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 shadow-sm">
+              <div>
+                <div className="font-black text-amber-950">テスト注文の整理</div>
+                <div className="text-sm font-bold text-amber-800">
+                  表示中の未完了注文をキャンセルにすると、必要数・商品別合計から外れます。注文データ自体は履歴として残ります。
+                </div>
+              </div>
+              <button
+                type="button"
+                disabled={bulkCancelling}
+                onClick={cancelVisibleOrders}
+                className="rounded-md bg-amber-600 px-4 py-2 text-sm font-black text-white shadow-sm hover:bg-amber-700 disabled:opacity-60"
+              >
+                {bulkCancelling ? "処理中..." : `表示中の未完了を一括キャンセル (${cancellableOrders.length}件)`}
+              </button>
             </div>
           ) : null}
 
