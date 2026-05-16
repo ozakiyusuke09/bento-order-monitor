@@ -17,7 +17,11 @@ const STORAGE_KEY = "bento-order-monitor.mock-orders";
 const CHANNEL_NAME = "bento-order-monitor.orders";
 
 function orderByPickup(a: OrderWithRelations, b: OrderWithRelations) {
-  return `${a.pickup_date} ${a.pickup_time}`.localeCompare(`${b.pickup_date} ${b.pickup_time}`);
+  const pickup = `${a.pickup_date} ${a.pickup_time}`.localeCompare(`${b.pickup_date} ${b.pickup_time}`);
+  if (pickup !== 0) return pickup;
+  const created = a.created_at.localeCompare(b.created_at);
+  if (created !== 0) return created;
+  return a.id.localeCompare(b.id);
 }
 
 function normalizeOrder(row: any): OrderWithRelations {
@@ -89,7 +93,9 @@ export async function getOrdersByDate(date: string) {
       .select("*, order_items(*), order_attachments(*), status_logs(*)")
       .eq("pickup_date", date)
       .is("deleted_at", null)
-      .order("pickup_time", { ascending: true });
+      .order("pickup_time", { ascending: true })
+      .order("created_at", { ascending: true })
+      .order("id", { ascending: true });
 
     if (error) throw error;
     return (data ?? []).map(normalizeOrder).sort(orderByPickup);
@@ -108,7 +114,9 @@ export async function getFutureOrders(fromDate = todayString()) {
       .gt("pickup_date", fromDate)
       .is("deleted_at", null)
       .order("pickup_date", { ascending: true })
-      .order("pickup_time", { ascending: true });
+      .order("pickup_time", { ascending: true })
+      .order("created_at", { ascending: true })
+      .order("id", { ascending: true });
 
     if (error) throw error;
     return (data ?? []).map(normalizeOrder).sort(orderByPickup);
@@ -126,7 +134,9 @@ export async function getPastOrders(beforeDate = todayString()) {
       .select("*, order_items(*), order_attachments(*), status_logs(*)")
       .or(`pickup_date.lt.${beforeDate},deleted_at.not.is.null`)
       .order("pickup_date", { ascending: false })
-      .order("pickup_time", { ascending: true });
+      .order("pickup_time", { ascending: true })
+      .order("created_at", { ascending: true })
+      .order("id", { ascending: true });
 
     if (error) throw error;
     return (data ?? []).map(normalizeOrder).sort(orderByPickup);
@@ -231,15 +241,14 @@ export async function softDeleteOrder(order: OrderWithRelations) {
   const now = new Date().toISOString();
 
   if (hasSupabaseEnv && supabase) {
-    const { data: userData } = await supabase.auth.getUser();
-    const changedBy = userData.user?.id ?? null;
-
     const { error: updateError } = await supabase
       .from("orders")
-      .update({ deleted_at: now, deleted_by: changedBy, updated_at: now })
+      .update({ deleted_at: now, updated_at: now })
       .eq("id", order.id);
     if (updateError) throw updateError;
 
+    const { data: userData } = await supabase.auth.getUser();
+    const changedBy = userData.user?.id ?? null;
     const { error: logError } = await supabase.from("status_logs").insert({
       order_id: order.id,
       old_status: order.status,
@@ -247,7 +256,7 @@ export async function softDeleteOrder(order: OrderWithRelations) {
       changed_by: changedBy,
       note: "削除"
     });
-    if (logError) throw logError;
+    if (logError) console.warn("Failed to save delete log", logError);
     return;
   }
 
