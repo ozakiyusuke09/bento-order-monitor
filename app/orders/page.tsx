@@ -82,14 +82,14 @@ export default function OrdersPage() {
   return (
     <AuthGuard>
       <AppShell>
-        <main className="mx-auto max-w-7xl px-4 pb-28 pt-6 sm:pb-10">
-          <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
+        <main className="mx-auto max-w-7xl px-4 pb-28 pt-4 sm:pb-10 sm:pt-6">
+          <div className="mb-3 flex flex-wrap items-end justify-between gap-3 sm:mb-5 sm:gap-4">
             <div>
               <div className="text-sm font-bold text-slate-500">{dateLabel}</div>
               <h1 className="text-3xl font-black text-slate-950">{headingLabel}</h1>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="text-right text-xs font-bold text-slate-500">
+            <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:w-auto sm:justify-end">
+              <div className="text-xs font-bold text-slate-500 sm:text-right">
                 <div>5秒ごとに自動更新</div>
                 <div>
                   最終更新{" "}
@@ -102,14 +102,14 @@ export default function OrdersPage() {
                 type="button"
                 onClick={refresh}
                 disabled={refreshing}
-                className="inline-flex min-h-11 items-center gap-2 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-800 shadow-sm hover:bg-slate-50 disabled:opacity-60"
+                className="inline-flex min-h-10 items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-800 shadow-sm hover:bg-slate-50 disabled:opacity-60 sm:min-h-11 sm:px-4 sm:py-3"
               >
                 <RefreshCw className={`h-5 w-5 ${refreshing ? "animate-spin" : ""}`} />
                 更新
               </button>
               <Link
                 href="/orders/new"
-                className="inline-flex min-h-11 items-center gap-2 rounded-md bg-slate-950 px-4 py-3 text-sm font-bold text-white"
+                className="hidden min-h-11 items-center gap-2 rounded-md bg-slate-950 px-4 py-3 text-sm font-bold text-white sm:inline-flex"
               >
                 <Plus className="h-5 w-5" />
                 注文登録
@@ -117,12 +117,12 @@ export default function OrdersPage() {
             </div>
           </div>
 
-          <div className="mb-4 flex flex-wrap items-center gap-2 rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
+          <div className="mb-3 grid grid-cols-4 gap-1 rounded-lg border border-slate-200 bg-white p-2 shadow-sm sm:mb-4 sm:flex sm:flex-wrap sm:gap-2 sm:p-3">
             <NavPill href={`/orders?date=${today}`} active={mode === "date" && selectedDate === today} label="本日" />
             <NavPill href={`/orders?date=${tomorrow}`} active={mode === "date" && selectedDate === tomorrow} label="明日" />
             <NavPill href="/orders?view=reservations" active={mode === "future"} label="予約" />
             <NavPill href="/orders?view=history" active={mode === "past"} label="履歴" />
-            <label className="ml-auto flex items-center gap-2 text-sm font-bold text-slate-600">
+            <label className="col-span-4 mt-1 hidden items-center gap-2 text-sm font-bold text-slate-600 sm:ml-auto sm:mt-0 sm:flex">
               <CalendarDays className="h-4 w-4" />
               日付指定
               <input
@@ -144,7 +144,7 @@ export default function OrdersPage() {
           {filterLabel ? (
             <div className="mt-4 flex flex-wrap items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm">
               <div className="font-bold text-slate-700">
-                表示中：{filterLabel} {filteredOrders.length}件
+                表示中: {filterLabel} {filteredOrders.length}件
               </div>
               <a
                 href={baseHref}
@@ -181,8 +181,8 @@ function NavPill({ href, active, label }: { href: string; active: boolean; label
       href={href}
       className={
         active
-          ? "rounded-md bg-slate-950 px-4 py-2 text-sm font-black text-white"
-          : "rounded-md border border-slate-200 px-4 py-2 text-sm font-black text-slate-700 hover:bg-slate-50"
+          ? "flex min-h-10 items-center justify-center rounded-md bg-slate-950 px-3 py-2 text-sm font-black text-white"
+          : "flex min-h-10 items-center justify-center rounded-md border border-slate-200 px-3 py-2 text-sm font-black text-slate-700 hover:bg-slate-50"
       }
     >
       {label}
