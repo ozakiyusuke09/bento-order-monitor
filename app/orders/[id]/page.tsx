@@ -10,6 +10,7 @@ import { StatusBadge } from "@/components/status-badge";
 import { addAttachment, getOrder, subscribeToOrderChanges } from "@/lib/order-store";
 import { attachmentUrl } from "@/lib/attachments";
 import { displayDateTime, displayTime } from "@/lib/date";
+import { displayOrderNumber } from "@/lib/order-number";
 import { paymentMethodLabels, receiveTypeLabels, riceOptionLabels, statusLabels } from "@/lib/constants";
 import type { OrderWithRelations } from "@/lib/types";
 
@@ -74,6 +75,7 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
                     <h1 className="text-3xl font-black text-slate-950">{order.customer_name}</h1>
                   </div>
                   <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    <Info label="受注番号" value={displayOrderNumber(order)} />
                     <Info label="注文ID" value={order.id} />
                     <Info label="電話番号" value={order.phone || "-"} />
                     <Info label="受取日時" value={`${order.pickup_date} ${displayTime(order.pickup_time)}`} />

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { FileImage, MapPin, MessageSquare, Phone } from "lucide-react";
 import { displayTime, isPickupSoon } from "@/lib/date";
 import { receiveTypeLabels, riceOptionLabels } from "@/lib/constants";
+import { displayShortOrderNumber } from "@/lib/order-number";
 import type { OrderWithRelations } from "@/lib/types";
 import { StatusActions } from "@/components/status-actions";
 import { StatusBadge } from "@/components/status-badge";
@@ -12,6 +13,9 @@ export function OrderCard({ order, onChanged }: { order: OrderWithRelations; onC
   return (
     <article className={`rounded-lg border bg-white p-4 shadow-soft ${soon ? "border-red-300" : "border-slate-200"}`}>
       <div className="flex flex-wrap items-center gap-2">
+        <div className="rounded-md bg-slate-100 px-2 py-1 text-sm font-black text-slate-700">
+          {displayShortOrderNumber(order)}
+        </div>
         <StatusBadge status={order.status} />
         <div className="text-lg font-black text-slate-950">{displayTime(order.pickup_time)}</div>
         <div className={order.receive_type === "delivery" ? "rounded-md bg-violet-100 px-2 py-1 text-sm font-bold text-violet-800" : "rounded-md bg-slate-100 px-2 py-1 text-sm font-bold text-slate-700"}>

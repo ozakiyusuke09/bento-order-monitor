@@ -2,6 +2,8 @@ create extension if not exists pgcrypto;
 
 create table if not exists orders (
   id uuid primary key default gen_random_uuid(),
+  order_no text,
+  daily_sequence integer,
   status text not null default 'new' check (status in ('new', 'confirmed', 'cooking', 'completed', 'cancelled')),
   customer_name text not null,
   phone text,
@@ -18,6 +20,13 @@ create table if not exists orders (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+create unique index if not exists orders_order_no_unique
+on orders (order_no)
+where order_no is not null;
+
+create index if not exists orders_pickup_date_daily_sequence_idx
+on orders (pickup_date, daily_sequence);
 
 create table if not exists order_items (
   id uuid primary key default gen_random_uuid(),

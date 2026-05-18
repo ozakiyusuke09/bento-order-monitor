@@ -6,6 +6,8 @@ export type OrderSource = "manual" | "web" | "line" | "email" | "phone";
 
 export type Order = {
   id: string;
+  order_no: string | null;
+  daily_sequence: number | null;
   status: OrderStatus;
   customer_name: string;
   phone: string | null;
@@ -62,7 +64,19 @@ export type OrderWithRelations = Order & {
 };
 
 export type CreateOrderInput = {
-  order: Omit<Order, "id" | "status" | "deleted_at" | "deleted_by" | "created_at" | "updated_at" | "created_by" | "source"> & {
+  order: Omit<
+    Order,
+    | "id"
+    | "order_no"
+    | "daily_sequence"
+    | "status"
+    | "deleted_at"
+    | "deleted_by"
+    | "created_at"
+    | "updated_at"
+    | "created_by"
+    | "source"
+  > & {
     status?: OrderStatus;
     source?: OrderSource;
   };

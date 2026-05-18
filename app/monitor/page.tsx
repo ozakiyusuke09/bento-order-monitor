@@ -18,6 +18,7 @@ import { StatusBadge } from "@/components/status-badge";
 import { displayDate, displayTime, todayString } from "@/lib/date";
 import { receiveTypeLabels, statusLabels } from "@/lib/constants";
 import { summarizeOrders, summarizeRemainingOrders } from "@/lib/order-store";
+import { displayShortOrderNumber } from "@/lib/order-number";
 import { useOrders } from "@/hooks/use-orders";
 import type { OrderWithRelations } from "@/lib/types";
 
@@ -185,6 +186,9 @@ function NewOrderHero({ order, flash, mode }: { order: OrderWithRelations; flash
           <span className={`rounded-md px-2.5 py-1 text-sm font-black text-white ${badgeClass}`}>
             {isNew ? "NEW ORDER" : "ACTIVE ORDER"}
           </span>
+          <span className="rounded-md border border-white/15 bg-white/10 px-2.5 py-1 text-sm font-black text-slate-100">
+            {displayShortOrderNumber(order)}
+          </span>
           <span className="truncate text-2xl font-black">{isNew ? "新着注文！" : "最新の未完了注文"}</span>
         </div>
         <div className={`grid grid-cols-[110px_1.15fr_1.4fr_82px_1fr] gap-4 border-t pt-2 ${dividerClass}`}>
@@ -274,7 +278,10 @@ function MonitorOrderRow({ order, flash }: { order: OrderWithRelations; flash: b
         isAlert ? "bg-red-500/10" : ""
       }`}
     >
-      <div className={`text-xl font-black ${isAlert ? "text-red-300" : "text-slate-100"}`}>{displayTime(order.pickup_time)}</div>
+      <div>
+        <div className="text-xs font-black text-slate-400">{displayShortOrderNumber(order)}</div>
+        <div className={`text-xl font-black ${isAlert ? "text-red-300" : "text-slate-100"}`}>{displayTime(order.pickup_time)}</div>
+      </div>
       <div className="truncate text-base font-black text-white">{order.customer_name}</div>
       <div className="truncate text-base font-bold text-slate-100">{itemSummary}</div>
       <div className="text-base font-black text-white">x {quantity}</div>

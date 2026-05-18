@@ -3,6 +3,7 @@
 import { supabase, hasSupabaseEnv } from "@/lib/supabase";
 import { mockOrders, cryptoRandomId } from "@/lib/mock-data";
 import { todayString } from "@/lib/date";
+import { formatOrderNumber } from "@/lib/order-number";
 import type {
   CreateOrderInput,
   DashboardStats,
@@ -27,11 +28,46 @@ function orderByPickup(a: OrderWithRelations, b: OrderWithRelations) {
 function normalizeOrder(row: any): OrderWithRelations {
   return {
     ...row,
+    order_no: row.order_no ?? null,
+    daily_sequence: row.daily_sequence ?? null,
     deleted_at: row.deleted_at ?? null,
     deleted_by: row.deleted_by ?? null,
     items: row.order_items ?? row.items ?? [],
     attachments: row.order_attachments ?? row.attachments ?? [],
     status_logs: row.status_logs ?? []
+  };
+}
+
+async function getNextDailyOrderNumber(pickupDate: string) {
+  if (!supabase) {
+    return { order_no: null, daily_sequence: null };
+  }
+
+  const { data, error } = await supabase
+    .from("orders")
+    .select("daily_sequence")
+    .eq("pickup_date", pickupDate)
+    .order("daily_sequence", { ascending: false, nullsFirst: false })
+    .limit(1);
+
+  if (error) throw error;
+
+  const nextSequence = (data?.[0]?.daily_sequence ?? 0) + 1;
+  return {
+    order_no: formatOrderNumber(pickupDate, nextSequence),
+    daily_sequence: nextSequence
+  };
+}
+
+function getNextMockOrderNumber(pickupDate: string) {
+  const nextSequence =
+    readMockOrders()
+      .filter((order) => order.pickup_date === pickupDate)
+      .reduce((max, order) => Math.max(max, order.daily_sequence ?? 0), 0) + 1;
+
+  return {
+    order_no: formatOrderNumber(pickupDate, nextSequence),
+    daily_sequence: nextSequence
   };
 }
 
@@ -169,18 +205,31 @@ export async function createOrder(input: CreateOrderInput) {
   if (hasSupabaseEnv && supabase) {
     const { data: userData } = await supabase.auth.getUser();
     const createdBy = userData.user?.id ?? null;
-    const { data: order, error: orderError } = await supabase
-      .from("orders")
-      .insert({
-        ...input.order,
-        status,
-        source,
-        created_by: createdBy
-      })
-      .select()
-      .single();
 
-    if (orderError) throw orderError;
+    let order: { id: string } | null = null;
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      const numbering = await getNextDailyOrderNumber(input.order.pickup_date);
+      const { data, error: orderError } = await supabase
+        .from("orders")
+        .insert({
+          ...input.order,
+          status,
+          source,
+          created_by: createdBy,
+          ...numbering
+        })
+        .select()
+        .single();
+
+      if (!orderError) {
+        order = data;
+        break;
+      }
+
+      if (orderError.code !== "23505" || attempt === 1) throw orderError;
+    }
+
+    if (!order) throw new Error("注文登録に失敗しました。");
 
     const items = input.items.map((item) => ({ ...item, order_id: order.id }));
     const { error: itemsError } = await supabase.from("order_items").insert(items);
@@ -199,8 +248,10 @@ export async function createOrder(input: CreateOrderInput) {
 
   const now = new Date().toISOString();
   const id = cryptoRandomId();
+  const numbering = getNextMockOrderNumber(input.order.pickup_date);
   const order: OrderWithRelations = {
     id,
+    ...numbering,
     status,
     source,
     created_by: null,

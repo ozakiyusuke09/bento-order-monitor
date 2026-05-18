@@ -7,6 +7,8 @@ const today = todayString();
 export const mockOrders: OrderWithRelations[] = [
   {
     id: "demo-001",
+    order_no: `${today.replaceAll("-", "")}-001`,
+    daily_sequence: 1,
     status: "new",
     customer_name: "山田商事",
     phone: "03-0000-1111",
@@ -31,6 +33,8 @@ export const mockOrders: OrderWithRelations[] = [
   },
   {
     id: "demo-002",
+    order_no: `${today.replaceAll("-", "")}-002`,
+    daily_sequence: 2,
     status: "confirmed",
     customer_name: "田中様",
     phone: "090-1234-5678",
@@ -52,6 +56,8 @@ export const mockOrders: OrderWithRelations[] = [
   },
   {
     id: "demo-003",
+    order_no: `${today.replaceAll("-", "")}-003`,
+    daily_sequence: 3,
     status: "cooking",
     customer_name: "株式会社ABC",
     phone: "03-2222-3333",
@@ -73,6 +79,8 @@ export const mockOrders: OrderWithRelations[] = [
   },
   {
     id: "demo-004",
+    order_no: `${today.replaceAll("-", "")}-004`,
+    daily_sequence: 4,
     status: "completed",
     customer_name: "佐藤工務店",
     phone: "045-111-2222",

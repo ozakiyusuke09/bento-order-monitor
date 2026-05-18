@@ -6,6 +6,7 @@ import { StatusBadge } from "@/components/status-badge";
 import { displayTime, isPickupSoon } from "@/lib/date";
 import { receiveTypeLabels } from "@/lib/constants";
 import { softDeleteOrder } from "@/lib/order-store";
+import { displayShortOrderNumber } from "@/lib/order-number";
 import type { OrderWithRelations } from "@/lib/types";
 
 export function OrderList({
@@ -67,6 +68,7 @@ function OrderListRow({
     <article className={isDeleted ? "bg-slate-50 opacity-75" : soon ? "bg-red-50" : "bg-white"}>
       <div className="grid gap-2 px-3 py-2.5 lg:grid-cols-[64px_1fr_1.25fr_64px_86px_430px] lg:items-center">
         <div className="flex items-center gap-2 lg:block">
+          <div className="mb-0.5 text-xs font-black text-slate-500">{displayShortOrderNumber(order)}</div>
           <div className="text-xl font-black text-slate-950 lg:text-lg">{displayTime(order.pickup_time)}</div>
           {soon ? <span className="rounded-md bg-red-600 px-2 py-1 text-xs font-black text-white">時間注意</span> : null}
         </div>
