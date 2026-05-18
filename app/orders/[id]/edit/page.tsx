@@ -3,27 +3,14 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Plus, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, Save } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { AuthGuard } from "@/components/auth-guard";
+import { blankOrderItem, OrderItemsEditor, type OrderItemFormValue } from "@/components/order-items-editor";
 import { getOrder, updateOrder } from "@/lib/order-store";
 import { displayOrderNumber } from "@/lib/order-number";
-import { paymentMethodLabels, productChoices, receiveTypeLabels, riceOptionLabels } from "@/lib/constants";
+import { paymentMethodLabels, receiveTypeLabels } from "@/lib/constants";
 import type { OrderWithRelations, RiceOption, UpdateOrderInput } from "@/lib/types";
-
-type FormItem = {
-  product_name: string;
-  quantity: string;
-  rice_option: RiceOption;
-  note: string;
-};
-
-const blankItem: FormItem = {
-  product_name: "",
-  quantity: "1",
-  rice_option: "normal",
-  note: ""
-};
 
 export default function EditOrderPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -36,7 +23,7 @@ export default function EditOrderPage({ params }: { params: { id: string } }) {
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [note, setNote] = useState("");
-  const [items, setItems] = useState<FormItem[]>([{ ...blankItem }]);
+  const [items, setItems] = useState<OrderItemFormValue[]>([{ ...blankOrderItem }]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -66,7 +53,7 @@ export default function EditOrderPage({ params }: { params: { id: string } }) {
               rice_option: item.rice_option as RiceOption,
               note: item.note ?? ""
             }))
-          : [{ ...blankItem }]
+          : [{ ...blankOrderItem }]
       );
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "注文の取得に失敗しました。");
@@ -78,10 +65,6 @@ export default function EditOrderPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     loadOrder();
   }, [loadOrder]);
-
-  function updateItem(index: number, patch: Partial<FormItem>) {
-    setItems((current) => current.map((item, itemIndex) => (itemIndex === index ? { ...item, ...patch } : item)));
-  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -138,7 +121,7 @@ export default function EditOrderPage({ params }: { params: { id: string } }) {
   return (
     <AuthGuard>
       <AppShell>
-        <main className="mx-auto max-w-4xl px-4 pb-28 pt-6 sm:pb-10">
+        <main className="mx-auto max-w-4xl px-4 pb-44 pt-6 sm:pb-10">
           <Link href={`/orders/${params.id}`} className="mb-4 inline-flex items-center gap-2 text-sm font-bold text-slate-600">
             <ArrowLeft className="h-4 w-4" />
             詳細へ戻る
@@ -208,87 +191,12 @@ export default function EditOrderPage({ params }: { params: { id: string } }) {
                 </label>
               </section>
 
-              <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-soft">
-                <div className="flex items-center justify-between gap-4">
-                  <h2 className="text-xl font-black text-slate-950">商品</h2>
-                  <button
-                    type="button"
-                    onClick={() => setItems((current) => [...current, { ...blankItem }])}
-                    className="inline-flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm font-bold"
-                  >
-                    <Plus className="h-4 w-4" />
-                    追加
-                  </button>
-                </div>
-                <div className="mt-4 space-y-4">
-                  {items.map((item, index) => (
-                    <div key={index} className="grid gap-3 rounded-lg border border-slate-200 p-3 sm:grid-cols-[1fr_100px_130px_auto]">
-                      <label>
-                        <span className="text-sm font-bold text-slate-700">商品名</span>
-                        <input
-                          list="products"
-                          value={item.product_name}
-                          onChange={(event) => updateItem(index, { product_name: event.target.value })}
-                          className="mt-1 h-12 w-full rounded-md border border-slate-300 px-3"
-                        />
-                      </label>
-                      <label>
-                        <span className="text-sm font-bold text-slate-700">数量</span>
-                        <input
-                          type="number"
-                          min={1}
-                          inputMode="numeric"
-                          value={item.quantity}
-                          onChange={(event) => updateItem(index, { quantity: event.target.value })}
-                          className="mt-1 h-12 w-full rounded-md border border-slate-300 px-3"
-                        />
-                      </label>
-                      <label>
-                        <span className="text-sm font-bold text-slate-700">ご飯量</span>
-                        <select
-                          value={item.rice_option}
-                          onChange={(event) => updateItem(index, { rice_option: event.target.value as RiceOption })}
-                          className="mt-1 h-12 w-full rounded-md border border-slate-300 px-3"
-                        >
-                          {Object.entries(riceOptionLabels).map(([value, label]) => (
-                            <option key={value} value={value}>
-                              {label}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      <button
-                        type="button"
-                        aria-label="商品を削除"
-                        title="商品を削除"
-                        onClick={() => setItems((current) => current.filter((_, itemIndex) => itemIndex !== index))}
-                        className="mt-6 h-12 rounded-md border border-slate-200 px-3 text-slate-600"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </button>
-                      <label className="sm:col-span-4">
-                        <span className="text-sm font-bold text-slate-700">商品メモ</span>
-                        <input
-                          value={item.note}
-                          onChange={(event) => updateItem(index, { note: event.target.value })}
-                          className="mt-1 h-12 w-full rounded-md border border-slate-300 px-3"
-                        />
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              <datalist id="products">
-                {productChoices.map((name) => (
-                  <option key={name} value={name} />
-                ))}
-              </datalist>
+              <OrderItemsEditor items={items} onItemsChange={setItems} saving={saving} submitLabel="変更を保存" savingLabel="保存中..." />
 
               <button
                 type="submit"
                 disabled={saving}
-                className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-md bg-slate-950 px-5 text-lg font-black text-white disabled:opacity-60"
+                className="hidden h-14 w-full items-center justify-center gap-2 rounded-md bg-slate-950 px-5 text-lg font-black text-white disabled:opacity-60 sm:inline-flex"
               >
                 <Save className="h-5 w-5" />
                 {saving ? "保存中..." : "変更を保存"}
