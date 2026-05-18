@@ -483,12 +483,14 @@ export function summarizeOrders(orders: OrderWithRelations[]): DashboardStats {
   };
   const productMap = new Map<string, number>();
   let attachmentCount = 0;
+  let pickupCount = 0;
   let deliveryCount = 0;
 
   for (const order of activeOrders) {
     statusCounts[order.status] += 1;
     attachmentCount += order.attachments.length;
     if (order.receive_type === "delivery") deliveryCount += 1;
+    else pickupCount += 1;
     for (const item of order.items) {
       productMap.set(item.product_name, (productMap.get(item.product_name) ?? 0) + item.quantity);
     }
@@ -503,6 +505,7 @@ export function summarizeOrders(orders: OrderWithRelations[]): DashboardStats {
     productTotals,
     totalItems: productTotals.reduce((sum, item) => sum + item.quantity, 0),
     attachmentCount,
+    pickupCount,
     deliveryCount
   };
 }

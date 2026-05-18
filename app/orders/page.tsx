@@ -13,11 +13,11 @@ import { receiveTypeLabels, statusLabels } from "@/lib/constants";
 import { summarizeOrders, summarizeRemainingOrders } from "@/lib/order-store";
 import { useOrders, type OrdersMode } from "@/hooks/use-orders";
 import { displayDate, todayString, tomorrowString } from "@/lib/date";
-import type { OrderStatus } from "@/lib/types";
+import type { OrderStatus, ReceiveType } from "@/lib/types";
 
 type ActiveFilter =
   | { type: "status"; value: OrderStatus }
-  | { type: "receive"; value: "delivery" }
+  | { type: "receive"; value: ReceiveType }
   | null;
 
 const validStatuses: OrderStatus[] = ["new", "confirmed", "cooking", "completed", "cancelled"];
@@ -38,6 +38,7 @@ export default function OrdersPage() {
       const view = params.get("view");
       const date = params.get("date");
       const status = params.get("status") as OrderStatus | null;
+      const receive = params.get("receive") as ReceiveType | null;
 
       if (view === "reservations") {
         setMode("future");
@@ -50,8 +51,8 @@ export default function OrdersPage() {
 
       if (status && validStatuses.includes(status)) {
         setActiveFilter({ type: "status", value: status });
-      } else if (params.get("receive") === "delivery") {
-        setActiveFilter({ type: "receive", value: "delivery" });
+      } else if (receive === "pickup" || receive === "delivery") {
+        setActiveFilter({ type: "receive", value: receive });
       } else {
         setActiveFilter(null);
       }

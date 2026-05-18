@@ -103,5 +103,6 @@ export type DashboardStats = {
   productTotals: Array<{ product_name: string; quantity: number }>;
   totalItems: number;
   attachmentCount: number;
+  pickupCount: number;
   deliveryCount: number;
 };

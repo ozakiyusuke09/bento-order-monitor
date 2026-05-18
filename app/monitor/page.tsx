@@ -11,7 +11,8 @@ import {
   CookingPot,
   PackageCheck,
   ShoppingBag,
-  Truck
+  Truck,
+  X
 } from "lucide-react";
 import { AuthGuard } from "@/components/auth-guard";
 import { StatusBadge } from "@/components/status-badge";
@@ -130,12 +131,18 @@ export default function MonitorPage() {
 
           <div className="grid min-h-0 grid-cols-[1fr_360px] gap-3">
             <section className="grid min-h-0 grid-rows-[auto_1fr] gap-3">
-              <div className="grid grid-cols-5 gap-2">
-                <MonitorStatusCard label="新規" count={stats.statusCounts.new} tone="red" icon={<ClipboardPlus />} />
-                <MonitorStatusCard label="確認済み" count={stats.statusCounts.confirmed} tone="amber" icon={<CheckCircle2 />} />
-                <MonitorStatusCard label="調理中" count={stats.statusCounts.cooking} tone="blue" icon={<CookingPot />} />
-                <MonitorStatusCard label="完了" count={stats.statusCounts.completed} tone="green" icon={<PackageCheck />} />
-                <MonitorStatusCard label="配達" count={stats.deliveryCount} tone="violet" icon={<Truck />} />
+              <div className="space-y-2">
+                <div className="grid grid-cols-5 gap-2">
+                  <MonitorStatusCard label="新規" count={stats.statusCounts.new} tone="red" icon={<ClipboardPlus />} />
+                  <MonitorStatusCard label="確認済み" count={stats.statusCounts.confirmed} tone="amber" icon={<CheckCircle2 />} />
+                  <MonitorStatusCard label="調理中" count={stats.statusCounts.cooking} tone="blue" icon={<CookingPot />} />
+                  <MonitorStatusCard label="完了" count={stats.statusCounts.completed} tone="green" icon={<PackageCheck />} />
+                  <MonitorStatusCard label="中止" count={stats.statusCounts.cancelled} tone="slate" icon={<X />} />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <MonitorStatusCard label="店頭受取" count={stats.pickupCount} tone="slate" icon={<ShoppingBag />} />
+                  <MonitorStatusCard label="配達" count={stats.deliveryCount} tone="violet" icon={<Truck />} />
+                </div>
               </div>
 
               <section className="min-h-0 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04]">
@@ -245,7 +252,7 @@ function MonitorStatusCard({
 }: {
   label: string;
   count: number;
-  tone: "red" | "amber" | "blue" | "green" | "violet";
+  tone: "red" | "amber" | "blue" | "green" | "violet" | "slate";
   icon: ReactNode;
 }) {
   const tones = {
@@ -253,7 +260,8 @@ function MonitorStatusCard({
     amber: "border-amber-500/60 bg-amber-600/20 text-amber-100",
     blue: "border-blue-500/60 bg-blue-600/20 text-blue-100",
     green: "border-emerald-500/60 bg-emerald-600/20 text-emerald-100",
-    violet: "border-violet-500/60 bg-violet-600/20 text-violet-100"
+    violet: "border-violet-500/60 bg-violet-600/20 text-violet-100",
+    slate: "border-slate-500/60 bg-slate-600/20 text-slate-100"
   };
 
   return (
