@@ -13,14 +13,14 @@ import type { OrderWithRelations, RiceOption, UpdateOrderInput } from "@/lib/typ
 
 type FormItem = {
   product_name: string;
-  quantity: number;
+  quantity: string;
   rice_option: RiceOption;
   note: string;
 };
 
 const blankItem: FormItem = {
   product_name: "",
-  quantity: 1,
+  quantity: "1",
   rice_option: "normal",
   note: ""
 };
@@ -62,7 +62,7 @@ export default function EditOrderPage({ params }: { params: { id: string } }) {
         next.items.length
           ? next.items.map((item) => ({
               product_name: item.product_name,
-              quantity: item.quantity,
+              quantity: String(item.quantity),
               rice_option: item.rice_option as RiceOption,
               note: item.note ?? ""
             }))
@@ -237,8 +237,9 @@ export default function EditOrderPage({ params }: { params: { id: string } }) {
                         <input
                           type="number"
                           min={1}
+                          inputMode="numeric"
                           value={item.quantity}
-                          onChange={(event) => updateItem(index, { quantity: Number(event.target.value) })}
+                          onChange={(event) => updateItem(index, { quantity: event.target.value })}
                           className="mt-1 h-12 w-full rounded-md border border-slate-300 px-3"
                         />
                       </label>

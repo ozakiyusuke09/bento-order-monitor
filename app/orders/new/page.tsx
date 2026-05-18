@@ -12,14 +12,14 @@ import type { CreateOrderInput, RiceOption } from "@/lib/types";
 
 type FormItem = {
   product_name: string;
-  quantity: number;
+  quantity: string;
   rice_option: RiceOption;
   note: string;
 };
 
 const blankItem: FormItem = {
   product_name: "唐揚げ弁当",
-  quantity: 1,
+  quantity: "1",
   rice_option: "normal",
   note: ""
 };
@@ -183,8 +183,9 @@ export default function NewOrderPage() {
                       <input
                         type="number"
                         min={1}
+                        inputMode="numeric"
                         value={item.quantity}
-                        onChange={(event) => updateItem(index, { quantity: Number(event.target.value) })}
+                        onChange={(event) => updateItem(index, { quantity: event.target.value })}
                         className="mt-1 h-12 w-full rounded-md border border-slate-300 px-3"
                       />
                     </label>
