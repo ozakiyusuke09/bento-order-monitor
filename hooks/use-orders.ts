@@ -10,18 +10,27 @@ export type OrdersMode = "date" | "future" | "past";
 export function useOrders(date = todayString(), mode: OrdersMode = "date") {
   const [orders, setOrders] = useState<OrderWithRelations[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
+    setRefreshing(true);
     try {
       setError(null);
       const next =
-        mode === "future" ? await getFutureOrders(todayString()) : mode === "past" ? await getPastOrders(todayString()) : await getOrdersByDate(date);
+        mode === "future"
+          ? await getFutureOrders(todayString())
+          : mode === "past"
+            ? await getPastOrders(todayString())
+            : await getOrdersByDate(date);
       setOrders(next);
+      setLastUpdatedAt(new Date());
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "注文の取得に失敗しました。");
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, [date, mode]);
 
@@ -46,5 +55,5 @@ export function useOrders(date = todayString(), mode: OrdersMode = "date") {
     };
   }, [refresh]);
 
-  return { orders, loading, error, refresh };
+  return { orders, loading, refreshing, lastUpdatedAt, error, refresh };
 }

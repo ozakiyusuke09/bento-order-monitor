@@ -83,8 +83,9 @@ export default function NewOrderPage() {
         items: normalizedItems
       };
 
-      const id = await createOrder(payload);
-      router.push(`/orders/${id}`);
+      await createOrder(payload);
+      router.push(`/orders?date=${pickupDate}`);
+      router.refresh();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "注文登録に失敗しました。");
     } finally {

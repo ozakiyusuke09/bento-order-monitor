@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, Plus, X } from "lucide-react";
+import { CalendarDays, Plus, RefreshCw, X } from "lucide-react";
 import { AuthGuard } from "@/components/auth-guard";
 import { AppShell } from "@/components/app-shell";
 import { DailyRequiredSummary } from "@/components/daily-required-summary";
@@ -28,7 +28,7 @@ export default function OrdersPage() {
   const [selectedDate, setSelectedDate] = useState(today);
   const [mode, setMode] = useState<OrdersMode>("date");
   const [activeFilter, setActiveFilter] = useState<ActiveFilter>(null);
-  const { orders, loading, error, refresh } = useOrders(selectedDate, mode);
+  const { orders, loading, refreshing, lastUpdatedAt, error, refresh } = useOrders(selectedDate, mode);
   const stats = summarizeOrders(orders);
   const remainingStats = summarizeRemainingOrders(orders);
 
@@ -87,13 +87,33 @@ export default function OrdersPage() {
               <div className="text-sm font-bold text-slate-500">{dateLabel}</div>
               <h1 className="text-3xl font-black text-slate-950">{headingLabel}</h1>
             </div>
-            <Link
-              href="/orders/new"
-              className="inline-flex min-h-11 items-center gap-2 rounded-md bg-slate-950 px-4 py-3 text-sm font-bold text-white"
-            >
-              <Plus className="h-5 w-5" />
-              注文登録
-            </Link>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="text-right text-xs font-bold text-slate-500">
+                <div>5秒ごとに自動更新</div>
+                <div>
+                  最終更新{" "}
+                  {lastUpdatedAt
+                    ? lastUpdatedAt.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+                    : "-"}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={refresh}
+                disabled={refreshing}
+                className="inline-flex min-h-11 items-center gap-2 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-800 shadow-sm hover:bg-slate-50 disabled:opacity-60"
+              >
+                <RefreshCw className={`h-5 w-5 ${refreshing ? "animate-spin" : ""}`} />
+                更新
+              </button>
+              <Link
+                href="/orders/new"
+                className="inline-flex min-h-11 items-center gap-2 rounded-md bg-slate-950 px-4 py-3 text-sm font-bold text-white"
+              >
+                <Plus className="h-5 w-5" />
+                注文登録
+              </Link>
+            </div>
           </div>
 
           <div className="mb-4 flex flex-wrap items-center gap-2 rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
