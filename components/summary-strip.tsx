@@ -1,4 +1,4 @@
-import { receiveTypeLabels, statusLabels, statusOrder, statusSoftStyles } from "@/lib/constants";
+import { receiveTypeLabels, statusOrder, statusSoftStyles } from "@/lib/constants";
 import type { DashboardStats, OrderStatus, ReceiveType } from "@/lib/types";
 
 type ActiveFilter =
@@ -12,6 +12,14 @@ const statusCountStyles: Record<OrderStatus, string> = {
   cooking: "text-blue-600",
   completed: "text-emerald-600",
   cancelled: "text-slate-500"
+};
+
+const statusSummaryLabels: Record<OrderStatus, string> = {
+  new: "新規",
+  confirmed: "確認済",
+  cooking: "調理中",
+  completed: "完了",
+  cancelled: "中止"
 };
 
 export function SummaryStrip({
@@ -41,7 +49,7 @@ export function SummaryStrip({
           {statusOrder.map((status) => (
             <SummaryCard
               key={status}
-              label={statusLabels[status]}
+              label={statusSummaryLabels[status]}
               value={stats.statusCounts[status]}
               monitor
               active={false}
@@ -61,7 +69,9 @@ export function SummaryStrip({
   return (
     <div className="space-y-3">
       <section className="space-y-2">
-        <div className="text-sm font-bold text-slate-500">ステータス別 <span className="font-black">合計 {totalStatus}件</span></div>
+        <div className="text-sm font-bold text-slate-500">
+          ステータス別 <span className="font-black">合計 {totalStatus}件</span>
+        </div>
         <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
           {statusOrder.map((status) => {
             const active = activeFilter?.type === "status" && activeFilter.value === status;
@@ -69,7 +79,7 @@ export function SummaryStrip({
               <SummaryCard
                 key={status}
                 href={interactive ? withParam(baseHref, "status", status) : undefined}
-                label={statusLabels[status]}
+                label={statusSummaryLabels[status]}
                 value={stats.statusCounts[status]}
                 monitor={false}
                 active={active}
@@ -81,7 +91,9 @@ export function SummaryStrip({
       </section>
 
       <section className="space-y-2">
-        <div className="text-sm font-bold text-slate-500">受取方法別 <span className="font-black">合計 {totalReceive}件</span></div>
+        <div className="text-sm font-bold text-slate-500">
+          受取方法別 <span className="font-black">合計 {totalReceive}件</span>
+        </div>
         <div className="grid grid-cols-2 gap-2">
           {receiveCards.map((card) => {
             const active = activeFilter?.type === "receive" && activeFilter.value === card.value;
@@ -89,7 +101,7 @@ export function SummaryStrip({
               <SummaryCard
                 key={card.value}
                 href={interactive ? withParam(baseHref, "receive", card.value) : undefined}
-                label={card.value === "delivery" ? `🚚 ${receiveTypeLabels[card.value]}` : receiveTypeLabels[card.value]}
+                label={receiveTypeLabels[card.value]}
                 value={card.count}
                 monitor={false}
                 active={active}
@@ -126,14 +138,14 @@ function SummaryCard({
   const baseClass = monitor
     ? `rounded-lg border p-3 ${className}`
     : active
-      ? `rounded-lg border-2 border-slate-950 px-3 py-3 shadow-sm ${className}`
-      : `rounded-lg border border-slate-200 px-3 py-3 shadow-sm ${className}`;
+      ? `rounded-lg border-2 border-slate-950 px-1.5 py-2 shadow-sm ${className}`
+      : `rounded-lg border border-slate-200 px-1.5 py-2 shadow-sm ${className}`;
   const content = (
-    <div className={monitor ? "space-y-1" : "flex min-h-11 items-center justify-between gap-2 sm:block"}>
-      <div className={monitor ? "text-base font-black opacity-90" : "truncate text-xs font-bold text-slate-500"}>{label}</div>
-      <div className={monitor ? "text-3xl font-black" : "text-xl font-black sm:mt-1 sm:text-2xl"}>
+    <div className={monitor ? "space-y-1" : "grid min-h-16 place-items-center gap-1 text-center"}>
+      <div className={monitor ? "text-base font-black opacity-90" : "whitespace-nowrap text-[11px] font-bold leading-none text-slate-500"}>{label}</div>
+      <div className={monitor ? "text-3xl font-black" : "text-2xl font-black leading-none"}>
         {value}
-        <span className="ml-1 text-xs font-bold">件</span>
+        <span className="ml-0.5 text-xs font-bold">件</span>
       </div>
     </div>
   );
