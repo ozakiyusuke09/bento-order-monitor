@@ -137,6 +137,11 @@ to authenticated
 using (true)
 with check (true);
 
+create policy "authenticated can delete order items"
+on order_items for delete
+to authenticated
+using (true);
+
 create policy "authenticated can read status logs"
 on status_logs for select
 to authenticated

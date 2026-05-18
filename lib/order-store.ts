@@ -11,7 +11,8 @@ import type {
   OrderItem,
   OrderStatus,
   OrderWithRelations,
-  StatusLog
+  StatusLog,
+  UpdateOrderInput
 } from "@/lib/types";
 
 const STORAGE_KEY = "bento-order-monitor.mock-orders";
@@ -285,6 +286,70 @@ export async function createOrder(input: CreateOrderInput) {
 
   writeMockOrders([...readMockOrders(), order]);
   return id;
+}
+
+export async function updateOrder(order: OrderWithRelations, input: UpdateOrderInput) {
+  const now = new Date().toISOString();
+
+  if (hasSupabaseEnv && supabase) {
+    const { data: userData } = await supabase.auth.getUser();
+    const changedBy = userData.user?.id ?? null;
+    const { error: orderError } = await supabase
+      .from("orders")
+      .update({
+        ...input.order,
+        updated_at: now
+      })
+      .eq("id", order.id);
+    if (orderError) throw orderError;
+
+    const { error: deleteItemsError } = await supabase.from("order_items").delete().eq("order_id", order.id);
+    if (deleteItemsError) throw deleteItemsError;
+
+    const items = input.items.map((item) => ({ ...item, order_id: order.id }));
+    const { error: itemsError } = await supabase.from("order_items").insert(items);
+    if (itemsError) throw itemsError;
+
+    const { error: logError } = await supabase.from("status_logs").insert({
+      order_id: order.id,
+      old_status: order.status,
+      new_status: order.status,
+      changed_by: changedBy,
+      note: "注文内容編集"
+    });
+    if (logError) console.warn("Failed to save edit log", logError);
+    return;
+  }
+
+  writeMockOrders(
+    readMockOrders().map((current) => {
+      if (current.id !== order.id) return current;
+      const log: StatusLog = {
+        id: cryptoRandomId(),
+        order_id: current.id,
+        old_status: current.status,
+        new_status: current.status,
+        changed_by: null,
+        note: "注文内容編集",
+        created_at: now
+      };
+      return {
+        ...current,
+        ...input.order,
+        updated_at: now,
+        items: input.items.map<OrderItem>((item) => ({
+          id: cryptoRandomId(),
+          order_id: current.id,
+          product_name: item.product_name,
+          quantity: item.quantity,
+          rice_option: item.rice_option,
+          note: item.note,
+          created_at: now
+        })),
+        status_logs: [...current.status_logs, log]
+      };
+    })
+  );
 }
 
 export async function softDeleteOrder(order: OrderWithRelations) {

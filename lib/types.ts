@@ -83,6 +83,21 @@ export type CreateOrderInput = {
   items: Array<Pick<OrderItem, "product_name" | "quantity" | "rice_option" | "note">>;
 };
 
+export type UpdateOrderInput = {
+  order: Pick<
+    Order,
+    | "customer_name"
+    | "phone"
+    | "pickup_date"
+    | "pickup_time"
+    | "receive_type"
+    | "delivery_address"
+    | "payment_method"
+    | "note"
+  >;
+  items: Array<Pick<OrderItem, "product_name" | "quantity" | "rice_option" | "note">>;
+};
+
 export type DashboardStats = {
   statusCounts: Record<OrderStatus, number>;
   productTotals: Array<{ product_name: string; quantity: number }>;

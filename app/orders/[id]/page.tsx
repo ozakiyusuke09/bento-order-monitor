@@ -2,7 +2,7 @@
 
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, FileImage, Upload } from "lucide-react";
+import { ArrowLeft, FileImage, Pencil, Upload } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { AuthGuard } from "@/components/auth-guard";
 import { StatusActions } from "@/components/status-actions";
@@ -73,6 +73,13 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
                   <div className="flex flex-wrap items-center gap-3">
                     <StatusBadge status={order.status} />
                     <h1 className="text-3xl font-black text-slate-950">{order.customer_name}</h1>
+                    <Link
+                      href={`/orders/${order.id}/edit`}
+                      className="inline-flex min-h-10 items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm font-black text-slate-700 hover:bg-slate-50"
+                    >
+                      <Pencil className="h-4 w-4" />
+                      編集
+                    </Link>
                   </div>
                   <div className="mt-4 grid gap-3 sm:grid-cols-2">
                     <Info label="受注番号" value={displayOrderNumber(order)} />

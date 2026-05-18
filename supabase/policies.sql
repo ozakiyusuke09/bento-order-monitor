@@ -4,6 +4,7 @@ drop policy if exists "authenticated can update orders" on public.orders;
 drop policy if exists "authenticated can read order items" on public.order_items;
 drop policy if exists "authenticated can insert order items" on public.order_items;
 drop policy if exists "authenticated can update order items" on public.order_items;
+drop policy if exists "authenticated can delete order items" on public.order_items;
 drop policy if exists "authenticated can read status logs" on public.status_logs;
 drop policy if exists "authenticated can insert status logs" on public.status_logs;
 drop policy if exists "authenticated can read attachments" on public.order_attachments;
@@ -40,6 +41,11 @@ on public.order_items for update
 to authenticated
 using (true)
 with check (true);
+
+create policy "authenticated can delete order items"
+on public.order_items for delete
+to authenticated
+using (true);
 
 create policy "authenticated can read status logs"
 on public.status_logs for select
