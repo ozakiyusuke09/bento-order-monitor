@@ -25,37 +25,44 @@ export function ProductTotals({
           合計 {stats.totalItems} 個
         </div>
       </div>
-      <div className={compact ? "mt-3 space-y-2" : "mt-4 space-y-3"}>
+      <div className={compact ? "mt-3" : "mt-4"}>
         {stats.productTotals.length === 0 ? (
           <div className={monitor ? "text-slate-300" : "text-slate-500"}>本日の商品はまだありません。</div>
         ) : (
-          stats.productTotals.map((item) => (
-            <div key={item.product_name} className="flex items-center justify-between gap-4 border-t border-slate-200 px-3 py-2 first:border-t-0">
+          <div className="grid grid-cols-2 overflow-hidden rounded-md border border-slate-200">
+            {stats.productTotals.map((item, index) => (
               <div
-                className={
-                  monitor
-                    ? "truncate text-xl font-bold text-slate-100"
-                    : compact
-                      ? "truncate text-sm font-bold text-slate-800"
-                      : "truncate font-bold text-slate-800"
-                }
+                key={item.product_name}
+                className={`flex min-w-0 items-center justify-between gap-3 border-slate-200 px-3 py-2 ${
+                  index % 2 === 0 ? "border-r" : ""
+                } ${index < stats.productTotals.length - 2 ? "border-b" : ""}`}
               >
-                {item.product_name}
+                <div
+                  className={
+                    monitor
+                      ? "truncate text-xl font-bold text-slate-100"
+                      : compact
+                        ? "truncate text-sm font-bold text-slate-800"
+                        : "truncate font-bold text-slate-800"
+                  }
+                >
+                  {item.product_name}
+                </div>
+                <div
+                  className={
+                    monitor
+                      ? "shrink-0 text-3xl font-black text-white"
+                      : compact
+                        ? "shrink-0 text-base font-black text-slate-950"
+                        : "shrink-0 text-2xl font-black text-slate-950"
+                  }
+                >
+                  {item.quantity}
+                  <span className="ml-1 text-xs font-bold">個</span>
+                </div>
               </div>
-              <div
-                className={
-                  monitor
-                    ? "text-3xl font-black text-white"
-                    : compact
-                      ? "text-xl font-black text-slate-950"
-                      : "text-2xl font-black text-slate-950"
-                }
-              >
-                {item.quantity}
-                <span className="ml-1 text-sm font-bold">個</span>
-              </div>
-            </div>
-          ))
+            ))}
+          </div>
         )}
       </div>
     </section>

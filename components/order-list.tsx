@@ -26,7 +26,7 @@ export function OrderList({
 }) {
   return (
     <section className="space-y-2 lg:space-y-0 lg:overflow-hidden lg:rounded-lg lg:border lg:border-slate-200 lg:bg-white lg:shadow-soft">
-      <div className="hidden grid-cols-[72px_72px_minmax(130px,1fr)_minmax(180px,1.3fr)_70px_104px_230px] gap-3 border-b border-slate-200 bg-slate-50 px-4 py-3 text-sm font-black text-slate-500 lg:grid">
+      <div className="hidden grid-cols-[72px_72px_minmax(130px,0.9fr)_minmax(260px,1.8fr)_70px_96px_214px] gap-3 border-b border-slate-200 bg-slate-50 px-4 py-3 text-sm font-black text-slate-500 lg:grid">
         <div>時間</div>
         <div>No.</div>
         <div>注文者</div>
@@ -57,8 +57,6 @@ function OrderListRow({
   const isDeleted = Boolean(order.deleted_at);
   const soon = isPickupSoon(order.pickup_date, order.pickup_time) && order.status !== "completed" && !isDeleted;
   const nextStatus = isDeleted ? undefined : nextStatusByCurrent[order.status];
-  const itemLines = summarizeItemsForList(order);
-  const itemSummary = summarizeItemsForMobile(order);
 
   async function deleteOrder() {
     const ok = window.confirm(
@@ -128,7 +126,7 @@ function OrderListRow({
               )}
             </div>
             <div className="mt-1 truncate text-base font-black text-slate-950">{order.customer_name}</div>
-            <div className="mt-0.5 truncate text-sm font-bold text-slate-700">{itemSummary}</div>
+            <ProductChips order={order} mobile />
           </div>
           <div className="grid shrink-0 grid-cols-2 items-center gap-2">
             <span className="rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-center text-xs font-black text-slate-700 shadow-sm">
@@ -150,7 +148,7 @@ function OrderListRow({
         </div>
       </div>
 
-      <div className="hidden grid-cols-[72px_72px_minmax(130px,1fr)_minmax(180px,1.3fr)_70px_104px_230px] items-center gap-3 px-4 py-3 lg:grid">
+      <div className="hidden grid-cols-[72px_72px_minmax(130px,0.9fr)_minmax(260px,1.8fr)_70px_96px_214px] items-center gap-3 px-4 py-3 lg:grid">
         <div>
           <div className={`text-xl font-black ${soon ? "text-red-600" : "text-slate-950"}`}>{displayTime(order.pickup_time)}</div>
           {soon ? <div className="mt-1 text-xs font-black text-red-600">時間注意</div> : null}
@@ -178,12 +176,8 @@ function OrderListRow({
           </div>
         </div>
 
-        <div className="min-w-0 text-sm font-bold text-slate-900">
-          {itemLines.map((line, index) => (
-            <div key={`${order.id}-${index}`} className={index === 0 ? "truncate" : "truncate text-slate-500"}>
-              {line}
-            </div>
-          ))}
+        <div className="min-w-0">
+          <ProductChips order={order} />
         </div>
 
         <div>
@@ -231,23 +225,28 @@ function OrderListRow({
   );
 }
 
-function summarizeItemsForList(order: OrderWithRelations) {
-  if (order.items.length === 0) return ["-"];
-  if (order.items.length === 1) return [`${order.items[0].product_name} x${order.items[0].quantity}`];
-  if (order.items.length === 2) {
-    return order.items.map((item, index) => `${index === 0 ? "" : "+ "}${item.product_name} x${item.quantity}`);
+function ProductChips({ order, mobile = false }: { order: OrderWithRelations; mobile?: boolean }) {
+  if (order.items.length === 0) {
+    return <div className="text-sm font-bold text-slate-500">-</div>;
   }
-  const first = order.items[0];
-  return [`${first.product_name} x${first.quantity}`, `+ 他${order.items.length - 1}点`];
-}
 
-function summarizeItemsForMobile(order: OrderWithRelations) {
-  if (order.items.length === 0) return "-";
-  if (order.items.length <= 2) {
-    return order.items.map((item) => `${item.product_name} x${item.quantity}`).join(" / ");
-  }
-  const first = order.items[0];
-  return `${first.product_name} x${first.quantity} / 他${order.items.length - 1}点`;
+  return (
+    <div className={mobile ? "mt-1 flex flex-wrap gap-1" : "flex flex-wrap gap-1"}>
+      {order.items.map((item) => (
+        <span
+          key={item.id}
+          className={
+            mobile
+              ? "inline-flex max-w-full items-center rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[11px] font-black text-slate-800"
+              : "inline-flex max-w-full items-center rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-black text-slate-800"
+          }
+        >
+          <span className="truncate">{item.product_name}</span>
+          <span className="ml-1 shrink-0">x{item.quantity}</span>
+        </span>
+      ))}
+    </div>
+  );
 }
 
 function CompactStatus({ status }: { status: OrderStatus }) {

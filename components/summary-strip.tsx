@@ -90,25 +90,28 @@ export function SummaryStrip({
         </div>
       </section>
 
-      <section className="space-y-2">
-        <div className="text-sm font-bold text-slate-500 lg:hidden">
-          受取方法別 <span className="font-black">合計 {totalReceive}件</span>
-        </div>
-        <div className="grid grid-cols-2 gap-2">
+      <section>
+        <div className="flex flex-wrap items-center gap-3 text-sm font-black text-slate-800">
           {receiveCards.map((card) => {
             const active = activeFilter?.type === "receive" && activeFilter.value === card.value;
+            const className = active ? "border-slate-950 bg-slate-950 text-white" : "border-slate-200 bg-white text-slate-800";
+            const content = (
+              <>
+                <span>{receiveTypeLabels[card.value]}</span>
+                <span className={active ? "text-white" : card.value === "delivery" ? "text-violet-700" : "text-slate-950"}>{card.count}件</span>
+              </>
+            );
             return (
-              <SummaryCard
+              <a
                 key={card.value}
                 href={interactive ? withParam(baseHref, "receive", card.value) : undefined}
-                label={receiveTypeLabels[card.value]}
-                value={card.count}
-                monitor={false}
-                active={active}
-                className={card.className}
-              />
+                className={`inline-flex min-h-9 items-center gap-2 rounded-md border px-3 py-1.5 ${className}`}
+              >
+                {content}
+              </a>
             );
           })}
+          <span className="text-xs font-bold text-slate-500">受取方法 合計 {totalReceive}件</span>
         </div>
       </section>
     </div>

@@ -1,8 +1,6 @@
 import type { DashboardStats } from "@/lib/types";
 
 export function DailyRequiredSummary({ stats }: { stats: DashboardStats }) {
-  const topItems = stats.productTotals.slice(0, 4);
-
   return (
     <section className="rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm">
       <div className="flex items-start justify-between gap-4">
@@ -14,10 +12,15 @@ export function DailyRequiredSummary({ stats }: { stats: DashboardStats }) {
           <span className="ml-1 text-sm font-black text-slate-700">個</span>
         </div>
       </div>
-      {topItems.length > 0 ? (
+      {stats.productTotals.length > 0 ? (
         <div className="mt-3 grid grid-cols-2 overflow-hidden rounded-md border border-slate-200">
-          {topItems.map((item) => (
-            <div key={item.product_name} className="flex min-w-0 items-center justify-between gap-2 border-b border-r border-slate-200 px-3 py-2 even:border-r-0">
+          {stats.productTotals.map((item, index) => (
+            <div
+              key={item.product_name}
+              className={`flex min-w-0 items-center justify-between gap-2 border-slate-200 px-3 py-2 ${
+                index % 2 === 0 ? "border-r" : ""
+              } ${index < stats.productTotals.length - 2 ? "border-b" : ""}`}
+            >
               <span className="truncate text-xs font-black text-slate-700">{item.product_name}</span>
               <span className="shrink-0 text-sm font-black text-slate-950">{item.quantity}</span>
             </div>
