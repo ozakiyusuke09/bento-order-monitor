@@ -32,10 +32,6 @@ export default function NewOrderPage() {
       if (!customerName.trim()) throw new Error("注文者名を入力してください。");
       if (!pickupDate) throw new Error("受取日を入力してください。");
       if (!pickupTime) throw new Error("受取時間を入力してください。");
-      if (receiveType === "delivery" && !deliveryAddress.trim()) {
-        throw new Error("配達の場合は配達先を入力してください。");
-      }
-
       const normalizedItems = items
         .filter((item) => item.product_name.trim())
         .map((item) => ({
@@ -57,7 +53,7 @@ export default function NewOrderPage() {
           pickup_date: pickupDate,
           pickup_time: pickupTime,
           receive_type: receiveType,
-          delivery_address: receiveType === "delivery" ? deliveryAddress.trim() : null,
+          delivery_address: receiveType === "delivery" ? deliveryAddress.trim() || null : null,
           payment_method: paymentMethod,
           note: note.trim() || null
         },
@@ -118,7 +114,7 @@ export default function NewOrderPage() {
               </div>
               {receiveType === "delivery" ? (
                 <div className="mt-4">
-                  <Input label="配達先" value={deliveryAddress} onChange={setDeliveryAddress} />
+                  <Input label="配達先（任意）" value={deliveryAddress} onChange={setDeliveryAddress} />
                 </div>
               ) : null}
               <label className="mt-4 block">
