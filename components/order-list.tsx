@@ -26,7 +26,7 @@ export function OrderList({
 }) {
   return (
     <section className="space-y-2 lg:space-y-0 lg:overflow-hidden lg:rounded-lg lg:border lg:border-slate-200 lg:bg-white lg:shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
-      <div className="hidden grid-cols-[72px_72px_minmax(130px,0.9fr)_minmax(320px,1.9fr)_70px_96px_214px] gap-3 border-b border-slate-200 bg-slate-50/80 px-4 py-2.5 text-sm font-black text-slate-500 lg:grid">
+      <div className="hidden grid-cols-[72px_72px_minmax(105px,0.7fr)_minmax(380px,2.25fr)_70px_96px_214px] gap-3 border-b border-slate-200 bg-slate-50/80 px-4 py-2.5 text-sm font-black text-slate-500 lg:grid">
         <div>時間</div>
         <div>No.</div>
         <div>注文者</div>
@@ -148,7 +148,7 @@ function OrderListRow({
         </div>
       </div>
 
-      <div className="hidden grid-cols-[72px_72px_minmax(130px,0.9fr)_minmax(320px,1.9fr)_70px_96px_214px] items-center gap-3 px-4 py-2.5 lg:grid">
+      <div className="hidden grid-cols-[72px_72px_minmax(105px,0.7fr)_minmax(380px,2.25fr)_70px_96px_214px] items-center gap-3 px-4 py-2.5 lg:grid">
         <div>
           <div className={`text-lg font-black ${soon ? "text-red-600" : "text-slate-950"}`}>{displayTime(order.pickup_time)}</div>
           {soon ? <div className="mt-1 text-xs font-black text-red-600">時間注意</div> : null}

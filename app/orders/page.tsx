@@ -98,28 +98,7 @@ export default function OrdersPage() {
               <div className="text-sm font-bold text-slate-500">{dateLabel}</div>
               <h1 className="text-3xl font-black leading-tight tracking-normal text-slate-950 sm:text-[34px]">{headingLabel}</h1>
             </div>
-            <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-              <div className="hidden text-sm font-bold text-slate-700 sm:flex sm:items-center sm:gap-5">
-                <span>{displayDate(selectedDate)}</span>
-                <span>
-                  最終更新{" "}
-                  {lastUpdatedAt
-                    ? lastUpdatedAt.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
-                    : "-"}
-                </span>
-              </div>
-              <label className="hidden h-10 items-center gap-2 rounded-md border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 lg:flex">
-                <CalendarDays className="h-4 w-4" />
-                日付指定
-                <input
-                  type="date"
-                  value={selectedDate}
-                  onChange={(event) => {
-                    window.location.href = `/orders?date=${event.target.value}`;
-                  }}
-                  className="h-8 w-32 rounded border border-slate-200 px-2 text-sm font-bold"
-                />
-              </label>
+            <div className="flex shrink-0 items-center gap-2 sm:hidden">
               <button
                 type="button"
                 onClick={refresh}
@@ -140,9 +119,39 @@ export default function OrdersPage() {
             </span>
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(390px,430px)] lg:items-stretch xl:gap-5">
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(460px,2fr)] lg:items-start xl:gap-5">
             <div className="space-y-3">
-              <div className="grid grid-cols-4 gap-1 rounded-lg border border-slate-200 bg-white p-1 shadow-sm sm:inline-grid sm:w-auto sm:grid-cols-4">
+              <div className="hidden flex-wrap items-center gap-2 text-sm font-bold text-slate-700 lg:flex">
+                <span>{displayDate(selectedDate)}</span>
+                <span>
+                  最終更新{" "}
+                  {lastUpdatedAt
+                    ? lastUpdatedAt.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+                    : "-"}
+                </span>
+                <label className="inline-flex h-10 items-center gap-2 rounded-md border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700">
+                  <CalendarDays className="h-4 w-4" />
+                  日付指定
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={(event) => {
+                      window.location.href = `/orders?date=${event.target.value}`;
+                    }}
+                    className="h-8 w-32 rounded border border-slate-200 px-2 text-sm font-bold"
+                  />
+                </label>
+                <button
+                  type="button"
+                  onClick={refresh}
+                  disabled={refreshing}
+                  className="inline-flex h-10 items-center gap-2 rounded-md border border-slate-200 bg-white px-3 text-sm font-black text-slate-800 shadow-sm hover:bg-slate-50 disabled:opacity-60"
+                >
+                  <RefreshCw className={`h-5 w-5 ${refreshing ? "animate-spin" : ""}`} />
+                  <span>更新</span>
+                </button>
+              </div>
+              <div className="inline-grid grid-cols-4 gap-1 rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
                 <NavPill href={`/orders?date=${selectedDate || today}`} active={mode === "date" && !activeFilter} label="すべて" />
                 <NavPill
                   href={`/orders?date=${selectedDate || today}&handoff=before`}
