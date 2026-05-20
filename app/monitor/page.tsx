@@ -290,6 +290,27 @@ function MonitorOrderRow({ order, flash }: { order: OrderWithRelations; flash: b
 }
 
 function ProductPanel({ stats, compact = false }: { stats: ReturnType<typeof summarizeRemainingOrders>; compact?: boolean }) {
+  if (compact) {
+    return (
+      <section className="min-h-0 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] px-2 py-1.5">
+        <div className="flex h-full min-w-0 items-center gap-2">
+          <div className="shrink-0">
+            <h2 className="text-[clamp(0.8rem,1vw,0.95rem)] font-black leading-tight">商品別合計</h2>
+            <div className="text-[clamp(0.68rem,0.8vw,0.75rem)] font-black leading-tight text-slate-300">残り {stats.totalItems} 個</div>
+          </div>
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1 overflow-hidden">
+            {stats.productTotals.slice(0, 3).map((item) => (
+              <div key={item.product_name} className="inline-flex max-w-[46%] items-center gap-1 rounded-md border border-white/10 bg-white/[0.04] px-2 py-1">
+                <span className="truncate text-[clamp(0.72rem,0.9vw,0.85rem)] font-bold text-slate-100">{item.product_name}</span>
+                <span className="shrink-0 text-[clamp(0.9rem,1.2vw,1.1rem)] font-black leading-none text-white">{item.quantity}<span className="ml-0.5 text-[0.62rem]">個</span></span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="min-h-0 rounded-xl border border-white/10 bg-white/[0.04] p-2 xl:p-3">
       <div className="mb-2 flex items-end justify-between">
