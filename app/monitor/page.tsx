@@ -1,18 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { ReactNode } from "react";
 import Link from "next/link";
 import {
   Bell,
-  CheckCircle2,
-  ClipboardPlus,
   Clock,
-  CookingPot,
-  PackageCheck,
   ShoppingBag,
-  Truck,
-  X
 } from "lucide-react";
 import { AuthGuard } from "@/components/auth-guard";
 import { StatusBadge } from "@/components/status-badge";
@@ -130,18 +123,17 @@ export default function MonitorPage() {
           </div>
 
           <div className="grid min-h-0 grid-cols-[minmax(0,1fr)_minmax(260px,29vw)] gap-2 lg:gap-3">
-            <section className="grid min-h-0 grid-rows-[auto_minmax(0,60dvh)] gap-2 lg:gap-3">
-              <div className="space-y-2">
-                <div className="grid grid-cols-5 gap-1.5 lg:gap-2">
-                  <MonitorStatusCard label="新規" count={stats.statusCounts.new} tone="red" icon={<ClipboardPlus />} />
-                  <MonitorStatusCard label="確認済み" count={stats.statusCounts.confirmed} tone="amber" icon={<CheckCircle2 />} />
-                  <MonitorStatusCard label="調理完了" count={stats.statusCounts.cooking} tone="blue" icon={<CookingPot />} />
-                  <MonitorStatusCard label="完了" count={stats.statusCounts.completed} tone="green" icon={<PackageCheck />} />
-                  <MonitorStatusCard label="中止" count={stats.statusCounts.cancelled} tone="slate" icon={<X />} />
-                </div>
-                <div className="grid grid-cols-2 gap-1.5 lg:gap-2">
-                  <MonitorStatusCard label="店頭受取" count={stats.pickupCount} tone="slate" icon={<ShoppingBag />} />
-                  <MonitorStatusCard label="配達" count={stats.deliveryCount} tone="violet" icon={<Truck />} />
+            <section className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-2 lg:gap-3">
+              <div className="grid grid-cols-[repeat(5,minmax(0,1fr))_auto] items-stretch gap-1.5 lg:gap-2">
+                <MonitorStatusCard label="新規" count={stats.statusCounts.new} tone="red" />
+                <MonitorStatusCard label="確認済み" count={stats.statusCounts.confirmed} tone="amber" />
+                <MonitorStatusCard label="調理完了" count={stats.statusCounts.cooking} tone="blue" />
+                <MonitorStatusCard label="完了" count={stats.statusCounts.completed} tone="green" />
+                <MonitorStatusCard label="中止" count={stats.statusCounts.cancelled} tone="slate" />
+                <div className="flex min-w-[150px] items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.03] px-2 text-[clamp(0.68rem,0.85vw,0.8rem)] font-black text-slate-300">
+                  <span className="whitespace-nowrap">店頭 {stats.pickupCount}</span>
+                  <span className="text-slate-600">/</span>
+                  <span className="whitespace-nowrap">配達 {stats.deliveryCount}</span>
                 </div>
               </div>
 
@@ -245,13 +237,11 @@ function HeroField({
 function MonitorStatusCard({
   label,
   count,
-  tone,
-  icon
+  tone
 }: {
   label: string;
   count: number;
   tone: "red" | "amber" | "blue" | "green" | "violet" | "slate";
-  icon: ReactNode;
 }) {
   const tones = {
     red: "border-red-500/60 bg-red-600/20 text-red-100",
@@ -263,11 +253,10 @@ function MonitorStatusCard({
   };
 
   return (
-    <div className={`flex min-w-0 items-center gap-2 rounded-lg border p-1.5 xl:gap-2 xl:p-2 ${tones[tone]}`}>
-      <div className="shrink-0 [&>svg]:h-[clamp(1.35rem,1.9vw,1.75rem)] [&>svg]:w-[clamp(1.35rem,1.9vw,1.75rem)]">{icon}</div>
-      <div className="min-w-0">
-        <div className="truncate text-[clamp(0.74rem,0.9vw,0.92rem)] font-black">{label}</div>
-        <div className="text-[clamp(1.3rem,2vw,1.9rem)] font-black leading-tight">{count}<span className="ml-1 text-[clamp(0.7rem,0.9vw,0.92rem)]">件</span></div>
+    <div className={`flex min-w-0 items-center justify-between gap-2 rounded-md border px-2 py-1 ${tones[tone]}`}>
+      <div className="truncate text-[clamp(0.72rem,0.9vw,0.88rem)] font-black">{label}</div>
+      <div className="shrink-0 text-[clamp(1rem,1.4vw,1.3rem)] font-black leading-none">
+        {count}<span className="ml-0.5 text-[0.65rem]">件</span>
       </div>
     </div>
   );
