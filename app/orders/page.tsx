@@ -12,19 +12,19 @@ import { SummaryStrip } from "@/components/summary-strip";
 import { receiveTypeLabels, statusLabels } from "@/lib/constants";
 import { summarizeOrders, summarizeRemainingOrders } from "@/lib/order-store";
 import { useOrders, type OrdersMode } from "@/hooks/use-orders";
-import { displayDate, todayString, tomorrowString } from "@/lib/date";
+import { displayDate, todayString } from "@/lib/date";
 import type { OrderStatus, ReceiveType } from "@/lib/types";
 
 type ActiveFilter =
   | { type: "status"; value: OrderStatus }
   | { type: "receive"; value: ReceiveType }
+  | { type: "handoff"; value: "before" | "done" }
   | null;
 
 const validStatuses: OrderStatus[] = ["new", "confirmed", "cooking", "completed", "cancelled"];
 
 export default function OrdersPage() {
   const today = todayString();
-  const tomorrow = tomorrowString();
   const [selectedDate, setSelectedDate] = useState(today);
   const [mode, setMode] = useState<OrdersMode>("date");
   const [activeFilter, setActiveFilter] = useState<ActiveFilter>(null);
@@ -39,6 +39,7 @@ export default function OrdersPage() {
       const date = params.get("date");
       const status = params.get("status") as OrderStatus | null;
       const receive = params.get("receive") as ReceiveType | null;
+      const handoff = params.get("handoff");
 
       if (view === "reservations") {
         setMode("future");
@@ -53,6 +54,8 @@ export default function OrdersPage() {
         setActiveFilter({ type: "status", value: status });
       } else if (receive === "pickup" || receive === "delivery") {
         setActiveFilter({ type: "receive", value: receive });
+      } else if (handoff === "before" || handoff === "done") {
+        setActiveFilter({ type: "handoff", value: handoff });
       } else {
         setActiveFilter(null);
       }
@@ -66,6 +69,10 @@ export default function OrdersPage() {
   const filteredOrders = useMemo(() => {
     if (!activeFilter) return orders;
     if (activeFilter.type === "status") return orders.filter((order) => order.status === activeFilter.value);
+    if (activeFilter.type === "handoff") {
+      if (activeFilter.value === "done") return orders.filter((order) => order.status === "completed");
+      return orders.filter((order) => order.status !== "completed" && order.status !== "cancelled");
+    }
     return orders.filter((order) => order.receive_type === activeFilter.value);
   }, [activeFilter, orders]);
 
@@ -77,6 +84,10 @@ export default function OrdersPage() {
       ? statusLabels[activeFilter.value]
       : activeFilter?.type === "receive"
         ? receiveTypeLabels[activeFilter.value]
+        : activeFilter?.type === "handoff"
+          ? activeFilter.value === "done"
+            ? "受け渡し済み"
+            : "受け渡し前"
         : null;
 
   return (
@@ -118,9 +129,17 @@ export default function OrdersPage() {
           </div>
 
           <div className="mb-3 grid grid-cols-4 gap-1 rounded-lg border border-slate-200 bg-white p-2 shadow-sm sm:mb-4 sm:flex sm:flex-wrap sm:gap-2 sm:p-3">
-            <NavPill href={`/orders?date=${today}`} active={mode === "date" && selectedDate === today} label="本日" />
-            <NavPill href={`/orders?date=${tomorrow}`} active={mode === "date" && selectedDate === tomorrow} label="明日" />
-            <NavPill href="/orders?view=reservations" active={mode === "future"} label="予約" />
+            <NavPill href={`/orders?date=${selectedDate || today}`} active={mode === "date" && !activeFilter} label="すべて" />
+            <NavPill
+              href={`/orders?date=${selectedDate || today}&handoff=before`}
+              active={mode === "date" && activeFilter?.type === "handoff" && activeFilter.value === "before"}
+              label="受渡前"
+            />
+            <NavPill
+              href={`/orders?date=${selectedDate || today}&handoff=done`}
+              active={mode === "date" && activeFilter?.type === "handoff" && activeFilter.value === "done"}
+              label="受渡済"
+            />
             <NavPill href="/orders?view=history" active={mode === "past"} label="履歴" />
             <label className="col-span-4 mt-1 hidden items-center gap-2 text-sm font-bold text-slate-600 sm:ml-auto sm:mt-0 sm:flex">
               <CalendarDays className="h-4 w-4" />
@@ -138,7 +157,12 @@ export default function OrdersPage() {
 
           <div className="space-y-4">
             <DailyRequiredSummary stats={remainingStats} />
-            <SummaryStrip stats={stats} interactive activeFilter={activeFilter} baseHref={baseHref} />
+            <SummaryStrip
+              stats={stats}
+              interactive
+              activeFilter={activeFilter?.type === "handoff" ? null : activeFilter}
+              baseHref={baseHref}
+            />
           </div>
 
           {filterLabel ? (

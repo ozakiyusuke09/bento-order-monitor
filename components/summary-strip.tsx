@@ -18,7 +18,7 @@ const statusSummaryLabels: Record<OrderStatus, string> = {
   new: "新規",
   confirmed: "確認済",
   cooking: "調理完了",
-  completed: "完了",
+  completed: "受渡済",
   cancelled: "中止"
 };
 
@@ -141,9 +141,9 @@ function SummaryCard({
       ? `rounded-lg border-2 border-slate-950 px-1.5 py-2 shadow-sm ${className}`
       : `rounded-lg border border-slate-200 px-1.5 py-2 shadow-sm ${className}`;
   const content = (
-    <div className={monitor ? "space-y-1" : "grid min-h-16 place-items-center gap-1 text-center"}>
-      <div className={monitor ? "text-base font-black opacity-90" : "whitespace-nowrap text-[11px] font-bold leading-none text-slate-500"}>{label}</div>
-      <div className={monitor ? "text-3xl font-black" : "text-2xl font-black leading-none"}>
+    <div className={monitor ? "space-y-1" : "grid min-h-12 place-items-center gap-0.5 text-center sm:min-h-14"}>
+      <div className={monitor ? "text-base font-black opacity-90" : "whitespace-nowrap text-[10px] font-bold leading-none text-slate-500 sm:text-xs"}>{label}</div>
+      <div className={monitor ? "text-3xl font-black" : "text-xl font-black leading-none sm:text-2xl"}>
         {value}
         <span className="ml-0.5 text-xs font-bold">件</span>
       </div>

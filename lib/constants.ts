@@ -4,8 +4,8 @@ export const statusLabels: Record<OrderStatus, string> = {
   new: "新規",
   confirmed: "確認済み",
   cooking: "調理完了",
-  completed: "完了",
-  cancelled: "キャンセル"
+  completed: "受け渡し済み",
+  cancelled: "中止"
 };
 
 export const statusOrder: OrderStatus[] = ["new", "confirmed", "cooking", "completed", "cancelled"];
