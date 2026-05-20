@@ -27,7 +27,6 @@ export function AppShell({ children, dark = false }: { children: React.ReactNode
       >
         <div className="mx-auto flex max-w-7xl items-center gap-2 px-4 py-3">
           <Link href="/orders" className="mr-auto min-w-0">
-            <div className="text-sm font-semibold text-slate-500">弁当屋</div>
             <div className={dark ? "text-lg font-bold text-white" : "text-lg font-bold text-slate-950"}>
               受注モニター
             </div>
