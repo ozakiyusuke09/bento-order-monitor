@@ -73,7 +73,7 @@ export default function MonitorPage() {
   return (
     <AuthGuard>
       <main className="h-screen overflow-hidden bg-[#06101a] p-2 text-white lg:p-3">
-        <div className="mx-auto grid h-full w-full max-w-[1900px] grid-rows-[auto_minmax(92px,13dvh)_minmax(0,1fr)] gap-2 rounded-xl border border-slate-700 bg-gradient-to-br from-[#07131f] via-[#091923] to-[#03070c] p-2 shadow-2xl lg:gap-3 lg:p-3">
+        <div className="mx-auto grid h-full w-full max-w-[1900px] grid-rows-[auto_minmax(54px,7dvh)_minmax(0,1fr)] gap-2 rounded-xl border border-slate-700 bg-gradient-to-br from-[#07131f] via-[#091923] to-[#03070c] p-2 shadow-2xl lg:gap-3 lg:p-3">
           <header className="grid min-w-0 grid-cols-[minmax(240px,1fr)_auto] items-center gap-3 border-b border-white/10 pb-2">
             <div className="flex min-w-0 items-center gap-3">
               <div className="rounded-lg border border-white/10 bg-white/10 p-2">
@@ -116,7 +116,7 @@ export default function MonitorPage() {
 
           <div className="grid min-h-0 grid-cols-[minmax(0,1fr)_minmax(260px,29vw)] gap-2 lg:gap-3">
             <section
-              className={`min-h-0 rounded-xl border p-3 ${
+              className={`min-h-0 rounded-xl border p-2 ${
                 heroMode === "new"
                   ? "border-red-400 bg-red-500/10 shadow-[0_0_24px_rgba(248,113,113,0.22)]"
                   : featuredOrder
@@ -184,32 +184,30 @@ function NewOrderHero({ order, flash, mode }: { order: OrderWithRelations; flash
   const dividerClass = isNew ? "border-red-300/30" : "border-sky-300/30";
 
   return (
-    <div className={`grid h-full grid-cols-[clamp(58px,6vw,92px)_minmax(0,1fr)] items-center gap-2 lg:gap-3 ${flash ? "animate-pulse" : ""}`}>
-      <div className={`flex h-[clamp(58px,6vw,80px)] w-[clamp(58px,6vw,80px)] items-center justify-center rounded-full text-white ${iconClass}`}>
-        {isNew ? <Bell className="h-[clamp(2rem,3vw,2.75rem)] w-[clamp(2rem,3vw,2.75rem)]" /> : <Clock className="h-[clamp(2rem,3vw,2.75rem)] w-[clamp(2rem,3vw,2.75rem)]" />}
+    <div className={`grid h-full grid-cols-[44px_minmax(0,1fr)] items-center gap-2 ${flash ? "animate-pulse" : ""}`}>
+      <div className={`flex h-11 w-11 items-center justify-center rounded-full text-white ${iconClass}`}>
+        {isNew ? <Bell className="h-6 w-6" /> : <Clock className="h-6 w-6" />}
       </div>
-      <div className="min-w-0">
-        <div className="mb-2 flex min-w-0 items-center gap-2 lg:gap-3">
-          <span className={`shrink-0 rounded-md px-2 py-1 text-[clamp(0.7rem,0.9vw,0.9rem)] font-black text-white ${badgeClass}`}>
-            {isNew ? "NEW ORDER" : "ACTIVE ORDER"}
+      <div className={`grid min-w-0 grid-cols-[minmax(150px,0.9fr)_70px_minmax(92px,0.8fr)_minmax(160px,1.6fr)_58px_minmax(80px,0.8fr)] items-center gap-2 border-l pl-2 lg:gap-3 ${dividerClass}`}>
+        <div className="flex min-w-0 items-center gap-1.5">
+          <span className={`shrink-0 rounded px-1.5 py-0.5 text-[0.68rem] font-black leading-none text-white ${badgeClass}`}>
+            {isNew ? "NEW" : "ACTIVE"}
           </span>
-          <span className="shrink-0 rounded-md border border-white/15 bg-white/10 px-2 py-1 text-[clamp(0.7rem,0.9vw,0.9rem)] font-black text-slate-100">
+          <span className="shrink-0 rounded border border-white/15 bg-white/10 px-1.5 py-0.5 text-[0.68rem] font-black leading-none text-slate-100">
             {displayShortOrderNumber(order)}
           </span>
-          <span className="truncate text-[clamp(1.2rem,1.8vw,1.6rem)] font-black">{isNew ? "新着注文！" : "最新の未完了注文"}</span>
+          <span className="truncate text-[clamp(0.9rem,1.2vw,1.15rem)] font-black">{isNew ? "新着注文" : "未完了注文"}</span>
         </div>
-        <div className={`grid grid-cols-[82px_minmax(90px,1fr)_minmax(120px,1.4fr)_62px_minmax(80px,1fr)] gap-2 border-t pt-2 lg:gap-3 ${dividerClass}`}>
-          <HeroField label="受付時刻" value={displayTime(order.pickup_time)} large />
-          <HeroField label="注文者" value={order.customer_name} />
-          <HeroField label="商品・数量" value={mainItem ? itemText : "-"} />
-          <div className="min-w-0">
-            <div className="text-[clamp(0.68rem,0.85vw,0.85rem)] font-black text-slate-300">受取</div>
-            <span className={`mt-1 inline-flex max-w-full rounded-md px-2 py-1 text-[clamp(0.78rem,1vw,1rem)] font-black leading-none text-white ${badgeClass}`}>
-              {receiveTypeLabels[order.receive_type]}
-            </span>
-          </div>
-          <HeroField label="備考" value={order.note || order.delivery_address || "なし"} accent={Boolean(order.note || order.delivery_address)} />
+        <HeroField label="受付" value={displayTime(order.pickup_time)} large />
+        <HeroField label="注文者" value={order.customer_name} />
+        <HeroField label="商品・数量" value={mainItem ? itemText : "-"} />
+        <div className="min-w-0">
+          <div className="text-[0.62rem] font-black leading-tight text-slate-300">受取</div>
+          <span className={`mt-0.5 inline-flex max-w-full rounded px-1.5 py-0.5 text-[0.72rem] font-black leading-none text-white ${badgeClass}`}>
+            {receiveTypeLabels[order.receive_type]}
+          </span>
         </div>
+        <HeroField label="備考" value={order.note || order.delivery_address || "なし"} accent={Boolean(order.note || order.delivery_address)} />
       </div>
     </div>
   );
@@ -217,7 +215,7 @@ function NewOrderHero({ order, flash, mode }: { order: OrderWithRelations; flash
 
 function EmptyHero() {
   return (
-    <div className="flex h-full min-h-16 items-center justify-center text-2xl font-black text-slate-400">
+    <div className="flex h-full min-h-10 items-center justify-center text-lg font-black text-slate-400">
       本日の注文はまだありません。
     </div>
   );
@@ -236,8 +234,8 @@ function HeroField({
 }) {
   return (
     <div className="min-w-0">
-      <div className="text-[clamp(0.68rem,0.85vw,0.85rem)] font-black text-slate-300">{label}</div>
-      <div className={`mt-0.5 truncate font-black ${large ? "text-[clamp(1.3rem,2vw,2rem)]" : "text-[clamp(1.05rem,1.6vw,1.55rem)]"} ${accent ? "text-red-300" : "text-white"}`}>
+      <div className="text-[0.62rem] font-black leading-tight text-slate-300">{label}</div>
+      <div className={`mt-0.5 truncate font-black leading-tight ${large ? "text-[clamp(0.95rem,1.4vw,1.2rem)]" : "text-[clamp(0.82rem,1.1vw,1rem)]"} ${accent ? "text-red-300" : "text-white"}`}>
         {value}
       </div>
     </div>
