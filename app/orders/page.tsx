@@ -93,7 +93,7 @@ export default function OrdersPage() {
     <AuthGuard>
       <AppShell>
         <main className="mx-auto max-w-[1480px] px-4 pb-24 pt-3 sm:px-6 sm:pb-10 lg:px-8 lg:pt-5">
-          <div className="mb-3 flex items-end justify-between gap-3">
+          <div className="mb-3 flex items-end justify-between gap-3 lg:hidden">
             <div>
               <div className="text-sm font-bold text-slate-500">{dateLabel}</div>
               <h1 className="text-3xl font-black leading-tight tracking-normal text-slate-950 sm:text-[34px]">{headingLabel}</h1>
