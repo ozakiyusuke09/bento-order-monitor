@@ -69,10 +69,10 @@ export function SummaryStrip({
   return (
     <div className="space-y-3">
       <section className="space-y-2">
-        <div className="text-sm font-bold text-slate-500">
+        <div className="text-sm font-bold text-slate-500 lg:hidden">
           ステータス別 <span className="font-black">合計 {totalStatus}件</span>
         </div>
-        <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
+        <div className="grid grid-cols-5 gap-1.5 rounded-lg border border-slate-200 bg-white p-0 sm:gap-0 lg:divide-x lg:divide-slate-200">
           {statusOrder.map((status) => {
             const active = activeFilter?.type === "status" && activeFilter.value === status;
             return (
@@ -91,7 +91,7 @@ export function SummaryStrip({
       </section>
 
       <section className="space-y-2">
-        <div className="text-sm font-bold text-slate-500">
+        <div className="text-sm font-bold text-slate-500 lg:hidden">
           受取方法別 <span className="font-black">合計 {totalReceive}件</span>
         </div>
         <div className="grid grid-cols-2 gap-2">
@@ -138,11 +138,11 @@ function SummaryCard({
   const baseClass = monitor
     ? `rounded-lg border p-3 ${className}`
     : active
-      ? `rounded-lg border-2 border-slate-950 px-1.5 py-2 shadow-sm ${className}`
-      : `rounded-lg border border-slate-200 px-1.5 py-2 shadow-sm ${className}`;
+      ? `rounded-md border-2 border-slate-950 px-1.5 py-2 ${className}`
+      : `rounded-md border border-slate-200 px-1.5 py-2 lg:border-0 ${className}`;
   const content = (
-    <div className={monitor ? "space-y-1" : "grid min-h-12 place-items-center gap-0.5 text-center sm:min-h-14"}>
-      <div className={monitor ? "text-base font-black opacity-90" : "whitespace-nowrap text-[10px] font-bold leading-none text-slate-500 sm:text-xs"}>{label}</div>
+    <div className={monitor ? "space-y-1" : "grid min-h-12 place-items-center gap-0.5 text-center sm:min-h-16"}>
+      <div className={monitor ? "text-base font-black opacity-90" : "whitespace-nowrap text-[10px] font-black leading-none sm:text-xs"}>{label}</div>
       <div className={monitor ? "text-3xl font-black" : "text-xl font-black leading-none sm:text-2xl"}>
         {value}
         <span className="ml-0.5 text-xs font-bold">件</span>

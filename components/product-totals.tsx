@@ -30,7 +30,7 @@ export function ProductTotals({
           <div className={monitor ? "text-slate-300" : "text-slate-500"}>本日の商品はまだありません。</div>
         ) : (
           stats.productTotals.map((item) => (
-            <div key={item.product_name} className="flex items-center justify-between gap-4 border-t border-slate-100 pt-2 first:border-t-0 first:pt-0">
+            <div key={item.product_name} className="flex items-center justify-between gap-4 border-t border-slate-200 px-3 py-2 first:border-t-0">
               <div
                 className={
                   monitor

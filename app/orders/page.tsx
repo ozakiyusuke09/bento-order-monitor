@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, Plus, RefreshCw, X } from "lucide-react";
+import { CalendarDays, RefreshCw, X } from "lucide-react";
 import { AuthGuard } from "@/components/auth-guard";
 import { AppShell } from "@/components/app-shell";
 import { DailyRequiredSummary } from "@/components/daily-required-summary";
@@ -93,39 +92,40 @@ export default function OrdersPage() {
   return (
     <AuthGuard>
       <AppShell>
-        <main className="mx-auto max-w-7xl px-4 pb-28 pt-4 sm:pb-10 sm:pt-6">
-          <div className="mb-3 flex flex-wrap items-end justify-between gap-3 sm:mb-5 sm:gap-4">
+        <main className="mx-auto max-w-7xl px-4 pb-24 pt-4 sm:pb-10 sm:pt-6">
+          <div className="mb-3 flex items-end justify-between gap-3 sm:mb-5">
             <div>
               <div className="text-sm font-bold text-slate-500">{dateLabel}</div>
-              <h1 className="text-3xl font-black text-slate-950">{headingLabel}</h1>
+              <h1 className="text-3xl font-black leading-tight text-slate-950 sm:text-4xl">{headingLabel}</h1>
             </div>
-            <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:w-auto sm:justify-end">
-              <div className="text-xs font-bold text-slate-500 sm:text-right">
-                <div>5秒ごとに自動更新</div>
-                <div>
+            <div className="flex shrink-0 items-center gap-3">
+              <div className="hidden text-sm font-bold text-slate-700 sm:flex sm:items-center sm:gap-6">
+                <span>{displayDate(selectedDate)}</span>
+                <span>
                   最終更新{" "}
                   {lastUpdatedAt
                     ? lastUpdatedAt.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
                     : "-"}
-                </div>
+                </span>
               </div>
               <button
                 type="button"
                 onClick={refresh}
                 disabled={refreshing}
-                className="inline-flex min-h-10 items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-800 shadow-sm hover:bg-slate-50 disabled:opacity-60 sm:min-h-11 sm:px-4 sm:py-3"
+                className="inline-flex min-h-10 items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-black text-slate-800 shadow-sm hover:bg-slate-50 disabled:opacity-60 sm:min-h-11 sm:px-4 sm:py-3"
               >
                 <RefreshCw className={`h-5 w-5 ${refreshing ? "animate-spin" : ""}`} />
-                更新
+                <span className="hidden sm:inline">更新</span>
               </button>
-              <Link
-                href="/orders/new"
-                className="hidden min-h-11 items-center gap-2 rounded-md bg-slate-950 px-4 py-3 text-sm font-bold text-white sm:inline-flex"
-              >
-                <Plus className="h-5 w-5" />
-                注文登録
-              </Link>
             </div>
+          </div>
+          <div className="mb-3 flex items-center justify-between text-xs font-bold text-slate-500 sm:hidden">
+            <span>5秒ごとに自動更新</span>
+            <span>
+              {lastUpdatedAt
+                ? lastUpdatedAt.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+                : "-"}
+            </span>
           </div>
 
           <div className="mb-3 grid grid-cols-4 gap-1 rounded-lg border border-slate-200 bg-white p-2 shadow-sm sm:mb-4 sm:flex sm:flex-wrap sm:gap-2 sm:p-3">
@@ -155,14 +155,21 @@ export default function OrdersPage() {
             </label>
           </div>
 
-          <div className="space-y-4">
-            <DailyRequiredSummary stats={remainingStats} />
-            <SummaryStrip
-              stats={stats}
-              interactive
-              activeFilter={activeFilter?.type === "handoff" ? null : activeFilter}
-              baseHref={baseHref}
-            />
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_430px] lg:items-stretch">
+            <div className="space-y-4">
+              <div className="lg:hidden">
+                <DailyRequiredSummary stats={remainingStats} />
+              </div>
+              <SummaryStrip
+                stats={stats}
+                interactive
+                activeFilter={activeFilter?.type === "handoff" ? null : activeFilter}
+                baseHref={baseHref}
+              />
+            </div>
+            <div className="hidden lg:block">
+              <ProductTotals stats={remainingStats} compact />
+            </div>
           </div>
 
           {filterLabel ? (
@@ -180,18 +187,15 @@ export default function OrdersPage() {
             </div>
           ) : null}
 
-          <div className="mt-5 grid gap-4 xl:grid-cols-[1fr_260px]">
-            <div>
-              {loading ? <div className="text-slate-500">読み込み中...</div> : null}
-              {error ? <div className="rounded-md bg-red-50 p-4 font-bold text-red-700">{error}</div> : null}
-              {!loading && filteredOrders.length === 0 ? (
-                <div className="rounded-lg border border-slate-200 bg-white p-6 text-slate-500">
-                  表示する注文はありません。
-                </div>
-              ) : null}
-              {filteredOrders.length > 0 ? <OrderList orders={filteredOrders} onChanged={refresh} /> : null}
-            </div>
-            <ProductTotals stats={remainingStats} compact />
+          <div className="mt-5">
+            {loading ? <div className="text-slate-500">読み込み中...</div> : null}
+            {error ? <div className="rounded-md bg-red-50 p-4 font-bold text-red-700">{error}</div> : null}
+            {!loading && filteredOrders.length === 0 ? (
+              <div className="rounded-lg border border-slate-200 bg-white p-6 text-slate-500">
+                表示する注文はありません。
+              </div>
+            ) : null}
+            {filteredOrders.length > 0 ? <OrderList orders={filteredOrders} onChanged={refresh} /> : null}
           </div>
         </main>
       </AppShell>
