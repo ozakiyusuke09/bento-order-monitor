@@ -73,7 +73,7 @@ export default function MonitorPage() {
   return (
     <AuthGuard>
       <main className="h-screen overflow-hidden bg-[#06101a] p-2 text-white lg:p-3">
-        <div className="mx-auto grid h-full w-full max-w-[1900px] grid-rows-[auto_auto_minmax(0,1fr)] gap-2 rounded-xl border border-slate-700 bg-gradient-to-br from-[#07131f] via-[#091923] to-[#03070c] p-2 shadow-2xl lg:gap-3 lg:p-3">
+        <div className="mx-auto grid h-full w-full max-w-[1900px] grid-rows-[auto_minmax(92px,13dvh)_minmax(0,1fr)] gap-2 rounded-xl border border-slate-700 bg-gradient-to-br from-[#07131f] via-[#091923] to-[#03070c] p-2 shadow-2xl lg:gap-3 lg:p-3">
           <header className="grid min-w-0 grid-cols-[minmax(240px,1fr)_auto] items-center gap-3 border-b border-white/10 pb-2">
             <div className="flex min-w-0 items-center gap-3">
               <div className="rounded-lg border border-white/10 bg-white/10 p-2">
@@ -130,7 +130,7 @@ export default function MonitorPage() {
           </div>
 
           <div className="grid min-h-0 grid-cols-[minmax(0,1fr)_minmax(260px,29vw)] gap-2 lg:gap-3">
-            <section className="grid min-h-0 grid-rows-[auto_1fr] gap-2 lg:gap-3">
+            <section className="grid min-h-0 grid-rows-[auto_minmax(0,60dvh)] gap-2 lg:gap-3">
               <div className="space-y-2">
                 <div className="grid grid-cols-5 gap-1.5 lg:gap-2">
                   <MonitorStatusCard label="新規" count={stats.statusCounts.new} tone="red" icon={<ClipboardPlus />} />
@@ -217,7 +217,7 @@ function NewOrderHero({ order, flash, mode }: { order: OrderWithRelations; flash
 
 function EmptyHero() {
   return (
-    <div className="flex h-28 items-center justify-center text-2xl font-black text-slate-400">
+    <div className="flex h-full min-h-16 items-center justify-center text-2xl font-black text-slate-400">
       本日の注文はまだありません。
     </div>
   );
@@ -265,11 +265,11 @@ function MonitorStatusCard({
   };
 
   return (
-    <div className={`flex min-w-0 items-center gap-2 rounded-lg border p-2 xl:gap-3 xl:p-3 ${tones[tone]}`}>
-      <div className="shrink-0 [&>svg]:h-[clamp(1.6rem,2.2vw,2rem)] [&>svg]:w-[clamp(1.6rem,2.2vw,2rem)]">{icon}</div>
+    <div className={`flex min-w-0 items-center gap-2 rounded-lg border p-1.5 xl:gap-2 xl:p-2 ${tones[tone]}`}>
+      <div className="shrink-0 [&>svg]:h-[clamp(1.35rem,1.9vw,1.75rem)] [&>svg]:w-[clamp(1.35rem,1.9vw,1.75rem)]">{icon}</div>
       <div className="min-w-0">
-        <div className="truncate text-[clamp(0.82rem,1vw,1rem)] font-black">{label}</div>
-        <div className="text-[clamp(1.6rem,2.4vw,2.2rem)] font-black leading-tight">{count}<span className="ml-1 text-[clamp(0.75rem,1vw,1rem)]">件</span></div>
+        <div className="truncate text-[clamp(0.74rem,0.9vw,0.92rem)] font-black">{label}</div>
+        <div className="text-[clamp(1.3rem,2vw,1.9rem)] font-black leading-tight">{count}<span className="ml-1 text-[clamp(0.7rem,0.9vw,0.92rem)]">件</span></div>
       </div>
     </div>
   );
