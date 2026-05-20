@@ -135,7 +135,7 @@ export default function MonitorPage() {
                 <div className="grid grid-cols-5 gap-1.5 lg:gap-2">
                   <MonitorStatusCard label="新規" count={stats.statusCounts.new} tone="red" icon={<ClipboardPlus />} />
                   <MonitorStatusCard label="確認済み" count={stats.statusCounts.confirmed} tone="amber" icon={<CheckCircle2 />} />
-                  <MonitorStatusCard label="調理中" count={stats.statusCounts.cooking} tone="blue" icon={<CookingPot />} />
+                  <MonitorStatusCard label="調理完了" count={stats.statusCounts.cooking} tone="blue" icon={<CookingPot />} />
                   <MonitorStatusCard label="完了" count={stats.statusCounts.completed} tone="green" icon={<PackageCheck />} />
                   <MonitorStatusCard label="中止" count={stats.statusCounts.cancelled} tone="slate" icon={<X />} />
                 </div>

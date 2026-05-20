@@ -17,7 +17,7 @@ const statusCountStyles: Record<OrderStatus, string> = {
 const statusSummaryLabels: Record<OrderStatus, string> = {
   new: "新規",
   confirmed: "確認済",
-  cooking: "調理中",
+  cooking: "調理完了",
   completed: "完了",
   cancelled: "中止"
 };
