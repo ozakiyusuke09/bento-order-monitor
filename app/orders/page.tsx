@@ -92,14 +92,14 @@ export default function OrdersPage() {
   return (
     <AuthGuard>
       <AppShell>
-        <main className="mx-auto max-w-7xl px-4 pb-24 pt-4 sm:pb-10 sm:pt-6">
-          <div className="mb-3 flex items-end justify-between gap-3 sm:mb-5">
+        <main className="mx-auto max-w-[1480px] px-4 pb-24 pt-3 sm:px-6 sm:pb-10 lg:px-8 lg:pt-5">
+          <div className="mb-3 flex items-end justify-between gap-3">
             <div>
               <div className="text-sm font-bold text-slate-500">{dateLabel}</div>
-              <h1 className="text-3xl font-black leading-tight text-slate-950 sm:text-4xl">{headingLabel}</h1>
+              <h1 className="text-3xl font-black leading-tight tracking-normal text-slate-950 sm:text-[34px]">{headingLabel}</h1>
             </div>
-            <div className="flex shrink-0 items-center gap-3">
-              <div className="hidden text-sm font-bold text-slate-700 sm:flex sm:items-center sm:gap-6">
+            <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+              <div className="hidden text-sm font-bold text-slate-700 sm:flex sm:items-center sm:gap-5">
                 <span>{displayDate(selectedDate)}</span>
                 <span>
                   最終更新{" "}
@@ -108,7 +108,7 @@ export default function OrdersPage() {
                     : "-"}
                 </span>
               </div>
-              <label className="hidden items-center gap-2 text-sm font-bold text-slate-600 lg:flex">
+              <label className="hidden h-10 items-center gap-2 rounded-md border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 lg:flex">
                 <CalendarDays className="h-4 w-4" />
                 日付指定
                 <input
@@ -117,14 +117,14 @@ export default function OrdersPage() {
                   onChange={(event) => {
                     window.location.href = `/orders?date=${event.target.value}`;
                   }}
-                  className="h-10 w-36 rounded-md border border-slate-300 px-2"
+                  className="h-8 w-32 rounded border border-slate-200 px-2 text-sm font-bold"
                 />
               </label>
               <button
                 type="button"
                 onClick={refresh}
                 disabled={refreshing}
-                className="inline-flex min-h-10 items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-black text-slate-800 shadow-sm hover:bg-slate-50 disabled:opacity-60 sm:min-h-11 sm:px-4 sm:py-3"
+                className="inline-flex h-10 items-center gap-2 rounded-md border border-slate-200 bg-white px-3 text-sm font-black text-slate-800 shadow-sm hover:bg-slate-50 disabled:opacity-60"
               >
                 <RefreshCw className={`h-5 w-5 ${refreshing ? "animate-spin" : ""}`} />
                 <span className="hidden sm:inline">更新</span>
@@ -140,9 +140,9 @@ export default function OrdersPage() {
             </span>
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_430px] lg:items-stretch">
-            <div className="space-y-4">
-              <div className="grid grid-cols-4 gap-1 rounded-lg border border-slate-200 bg-white p-2 shadow-sm sm:inline-grid sm:w-auto sm:grid-cols-4">
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(390px,430px)] lg:items-stretch xl:gap-5">
+            <div className="space-y-3">
+              <div className="grid grid-cols-4 gap-1 rounded-lg border border-slate-200 bg-white p-1 shadow-sm sm:inline-grid sm:w-auto sm:grid-cols-4">
                 <NavPill href={`/orders?date=${selectedDate || today}`} active={mode === "date" && !activeFilter} label="すべて" />
                 <NavPill
                   href={`/orders?date=${selectedDate || today}&handoff=before`}
@@ -186,7 +186,7 @@ export default function OrdersPage() {
             </div>
           ) : null}
 
-          <div className="mt-5">
+          <div className="mt-4">
             {loading ? <div className="text-slate-500">読み込み中...</div> : null}
             {error ? <div className="rounded-md bg-red-50 p-4 font-bold text-red-700">{error}</div> : null}
             {!loading && filteredOrders.length === 0 ? (
@@ -208,8 +208,8 @@ function NavPill({ href, active, label }: { href: string; active: boolean; label
       href={href}
       className={
         active
-          ? "flex min-h-10 items-center justify-center rounded-md bg-slate-950 px-3 py-2 text-sm font-black text-white"
-          : "flex min-h-10 items-center justify-center rounded-md border border-slate-200 px-3 py-2 text-sm font-black text-slate-700 hover:bg-slate-50"
+          ? "flex h-10 items-center justify-center rounded-md bg-slate-950 px-5 text-sm font-black text-white"
+          : "flex h-10 items-center justify-center rounded-md px-5 text-sm font-black text-slate-800 hover:bg-slate-50"
       }
     >
       {label}

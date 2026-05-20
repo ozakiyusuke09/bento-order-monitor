@@ -2,7 +2,7 @@ import type { DashboardStats } from "@/lib/types";
 
 export function DailyRequiredSummary({ stats }: { stats: DashboardStats }) {
   return (
-    <section className="rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm">
+    <section className="rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="text-sm font-bold text-slate-500">残り必要数</div>
@@ -13,15 +13,15 @@ export function DailyRequiredSummary({ stats }: { stats: DashboardStats }) {
         </div>
       </div>
       {stats.productTotals.length > 0 ? (
-        <div className="mt-3 grid grid-cols-2 overflow-hidden rounded-md border border-slate-200">
+        <div className="mt-3 grid grid-cols-2 overflow-hidden rounded-md border border-slate-200 bg-white">
           {stats.productTotals.map((item, index) => (
             <div
               key={item.product_name}
-              className={`flex min-w-0 items-center justify-between gap-2 border-slate-200 px-3 py-2 ${
+              className={`flex min-w-0 items-center justify-between gap-2 border-slate-200 px-3 py-2.5 ${
                 index % 2 === 0 ? "border-r" : ""
               } ${index < stats.productTotals.length - 2 ? "border-b" : ""}`}
             >
-              <span className="truncate text-xs font-black text-slate-700">{item.product_name}</span>
+              <span className="truncate text-xs font-black text-slate-800">{item.product_name}</span>
               <span className="shrink-0 text-sm font-black text-slate-950">{item.quantity}</span>
             </div>
           ))}

@@ -25,8 +25,8 @@ export function OrderList({
   onChanged?: () => void;
 }) {
   return (
-    <section className="space-y-2 lg:space-y-0 lg:overflow-hidden lg:rounded-lg lg:border lg:border-slate-200 lg:bg-white lg:shadow-soft">
-      <div className="hidden grid-cols-[72px_72px_minmax(130px,0.9fr)_minmax(260px,1.8fr)_70px_96px_214px] gap-3 border-b border-slate-200 bg-slate-50 px-4 py-3 text-sm font-black text-slate-500 lg:grid">
+    <section className="space-y-2 lg:space-y-0 lg:overflow-hidden lg:rounded-lg lg:border lg:border-slate-200 lg:bg-white lg:shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+      <div className="hidden grid-cols-[72px_72px_minmax(130px,0.9fr)_minmax(320px,1.9fr)_70px_96px_214px] gap-3 border-b border-slate-200 bg-slate-50/80 px-4 py-2.5 text-sm font-black text-slate-500 lg:grid">
         <div>時間</div>
         <div>No.</div>
         <div>注文者</div>
@@ -148,9 +148,9 @@ function OrderListRow({
         </div>
       </div>
 
-      <div className="hidden grid-cols-[72px_72px_minmax(130px,0.9fr)_minmax(260px,1.8fr)_70px_96px_214px] items-center gap-3 px-4 py-3 lg:grid">
+      <div className="hidden grid-cols-[72px_72px_minmax(130px,0.9fr)_minmax(320px,1.9fr)_70px_96px_214px] items-center gap-3 px-4 py-2.5 lg:grid">
         <div>
-          <div className={`text-xl font-black ${soon ? "text-red-600" : "text-slate-950"}`}>{displayTime(order.pickup_time)}</div>
+          <div className={`text-lg font-black ${soon ? "text-red-600" : "text-slate-950"}`}>{displayTime(order.pickup_time)}</div>
           {soon ? <div className="mt-1 text-xs font-black text-red-600">時間注意</div> : null}
         </div>
 
@@ -200,12 +200,12 @@ function OrderListRow({
               type="button"
               disabled={savingStatus}
               onClick={advanceStatus}
-              className="shrink-0 rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-black text-slate-800 shadow-sm hover:bg-slate-50 disabled:opacity-60"
+              className="shrink-0 rounded-md border border-orange-200 bg-white px-2.5 py-1.5 text-xs font-black text-orange-700 shadow-sm hover:bg-orange-50 disabled:opacity-60"
             >
               {savingStatus ? "更新中" : statusLabels[nextStatus]}
             </button>
           ) : null}
-          <Link href={`/orders/${order.id}`} className="shrink-0 rounded-md bg-slate-950 px-2.5 py-1.5 text-xs font-black text-white">
+          <Link href={`/orders/${order.id}`} className="shrink-0 rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-black text-slate-800 shadow-sm hover:bg-slate-50">
             詳細
           </Link>
           {isDeleted ? null : (
@@ -213,7 +213,7 @@ function OrderListRow({
               type="button"
               disabled={deleting}
               onClick={deleteOrder}
-              className="inline-flex shrink-0 items-center gap-1 rounded-md border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-black text-red-700 hover:bg-red-100 disabled:opacity-60"
+              className="inline-flex shrink-0 items-center gap-1 rounded-md border border-red-200 bg-white px-2.5 py-1.5 text-xs font-black text-red-700 hover:bg-red-50 disabled:opacity-60"
             >
               <Trash2 className="h-3.5 w-3.5" />
               {deleting ? "削除中" : "削除"}
@@ -237,8 +237,8 @@ function ProductChips({ order, mobile = false }: { order: OrderWithRelations; mo
           key={item.id}
           className={
             mobile
-              ? "inline-flex max-w-full items-center rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[11px] font-black text-slate-800"
-              : "inline-flex max-w-full items-center rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-black text-slate-800"
+              ? "inline-flex max-w-full items-center rounded border border-slate-200 bg-white px-1.5 py-0.5 text-[11px] font-black text-slate-800 shadow-[0_1px_1px_rgba(15,23,42,0.03)]"
+              : "inline-flex max-w-full items-center rounded-md border border-slate-200 bg-white px-2 py-1 text-xs font-black text-slate-800 shadow-[0_1px_1px_rgba(15,23,42,0.03)]"
           }
         >
           <span className="truncate">{item.product_name}</span>

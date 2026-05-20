@@ -15,11 +15,11 @@ export function ProductTotals({
         monitor
           ? "rounded-lg border border-white/10 bg-white/5 p-5"
           : compact
-            ? "rounded-lg border border-slate-200 bg-white p-4 shadow-soft"
-            : "rounded-lg border border-slate-200 bg-white p-5 shadow-soft"
+            ? "rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
+            : "rounded-lg border border-slate-200 bg-white p-5 shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
       }
     >
-      <div className="flex items-end justify-between gap-4">
+      <div className="flex items-center justify-between gap-4">
         <h2 className={monitor ? "text-2xl font-black text-white" : "text-xl font-black text-slate-950"}>残り必要数</h2>
         <div className={monitor ? "text-lg font-bold text-slate-200" : "text-sm font-bold text-slate-500"}>
           合計 {stats.totalItems} 個
@@ -29,11 +29,11 @@ export function ProductTotals({
         {stats.productTotals.length === 0 ? (
           <div className={monitor ? "text-slate-300" : "text-slate-500"}>本日の商品はまだありません。</div>
         ) : (
-          <div className="grid grid-cols-2 overflow-hidden rounded-md border border-slate-200">
+          <div className="grid grid-cols-2 overflow-hidden rounded-md border border-slate-200 bg-white">
             {stats.productTotals.map((item, index) => (
               <div
                 key={item.product_name}
-                className={`flex min-w-0 items-center justify-between gap-3 border-slate-200 px-3 py-2 ${
+                className={`flex min-w-0 items-center justify-between gap-3 border-slate-200 px-3 py-2.5 ${
                   index % 2 === 0 ? "border-r" : ""
                 } ${index < stats.productTotals.length - 2 ? "border-b" : ""}`}
               >
@@ -42,7 +42,7 @@ export function ProductTotals({
                     monitor
                       ? "truncate text-xl font-bold text-slate-100"
                       : compact
-                        ? "truncate text-sm font-bold text-slate-800"
+                        ? "truncate text-sm font-black text-slate-800"
                         : "truncate font-bold text-slate-800"
                   }
                 >

@@ -4,7 +4,7 @@ import type { OrderStatus } from "@/lib/types";
 export function StatusBadge({ status, strong = false }: { status: OrderStatus; strong?: boolean }) {
   return (
     <span
-      className={`inline-flex items-center rounded-md border px-2.5 py-1 text-sm font-bold ${
+      className={`inline-flex items-center rounded-md border px-2.5 py-1 text-xs font-black ${
         strong ? statusStyles[status] : statusSoftStyles[status]
       }`}
     >

@@ -72,7 +72,7 @@ export function SummaryStrip({
         <div className="text-sm font-bold text-slate-500 lg:hidden">
           ステータス別 <span className="font-black">合計 {totalStatus}件</span>
         </div>
-        <div className="grid grid-cols-5 gap-1.5 rounded-lg border border-slate-200 bg-white p-0 sm:gap-0 lg:divide-x lg:divide-slate-200">
+        <div className="grid grid-cols-5 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] lg:divide-x lg:divide-slate-200">
           {statusOrder.map((status) => {
             const active = activeFilter?.type === "status" && activeFilter.value === status;
             return (
@@ -91,7 +91,7 @@ export function SummaryStrip({
       </section>
 
       <section>
-        <div className="flex flex-wrap items-center gap-3 text-sm font-black text-slate-800">
+        <div className="flex flex-wrap items-center gap-2 text-sm font-black text-slate-800 sm:gap-3">
           {receiveCards.map((card) => {
             const active = activeFilter?.type === "receive" && activeFilter.value === card.value;
             const className = active ? "border-slate-950 bg-slate-950 text-white" : "border-slate-200 bg-white text-slate-800";
@@ -105,13 +105,13 @@ export function SummaryStrip({
               <a
                 key={card.value}
                 href={interactive ? withParam(baseHref, "receive", card.value) : undefined}
-                className={`inline-flex min-h-9 items-center gap-2 rounded-md border px-3 py-1.5 ${className}`}
+                className={`inline-flex h-9 items-center gap-2 rounded-md border px-3 ${className}`}
               >
                 {content}
               </a>
             );
           })}
-          <span className="text-xs font-bold text-slate-500">受取方法 合計 {totalReceive}件</span>
+          <span className="text-xs font-bold text-slate-500">/ 合計 {totalReceive}件</span>
         </div>
       </section>
     </div>
@@ -141,12 +141,12 @@ function SummaryCard({
   const baseClass = monitor
     ? `rounded-lg border p-3 ${className}`
     : active
-      ? `rounded-md border-2 border-slate-950 px-1.5 py-2 ${className}`
-      : `rounded-md border border-slate-200 px-1.5 py-2 lg:border-0 ${className}`;
+      ? `border-2 border-slate-950 px-1.5 py-1.5 ${className}`
+      : `border border-slate-100 px-1.5 py-1.5 lg:border-0 ${className}`;
   const content = (
-    <div className={monitor ? "space-y-1" : "grid min-h-12 place-items-center gap-0.5 text-center sm:min-h-16"}>
+    <div className={monitor ? "space-y-1" : "grid min-h-12 place-items-center gap-0.5 text-center sm:min-h-[58px]"}>
       <div className={monitor ? "text-base font-black opacity-90" : "whitespace-nowrap text-[10px] font-black leading-none sm:text-xs"}>{label}</div>
-      <div className={monitor ? "text-3xl font-black" : "text-xl font-black leading-none sm:text-2xl"}>
+      <div className={monitor ? "text-3xl font-black" : "text-xl font-black leading-none sm:text-[25px]"}>
         {value}
         <span className="ml-0.5 text-xs font-bold">件</span>
       </div>
