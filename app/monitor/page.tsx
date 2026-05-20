@@ -72,49 +72,49 @@ export default function MonitorPage() {
 
   return (
     <AuthGuard>
-      <main className="h-screen overflow-hidden bg-[#06101a] p-3 text-white">
-        <div className="mx-auto grid h-full min-w-[1280px] max-w-[1900px] grid-rows-[auto_132px_1fr] gap-3 rounded-xl border border-slate-700 bg-gradient-to-br from-[#07131f] via-[#091923] to-[#03070c] p-4 shadow-2xl">
-          <header className="flex items-center justify-between gap-5 border-b border-white/10 pb-3">
-            <div className="flex items-center gap-4">
-              <div className="rounded-lg border border-white/10 bg-white/10 p-2.5">
-                <ShoppingBag className="h-8 w-8 text-slate-100" />
+      <main className="h-screen overflow-hidden bg-[#06101a] p-2 text-white lg:p-3">
+        <div className="mx-auto grid h-full w-full max-w-[1900px] grid-rows-[auto_auto_minmax(0,1fr)] gap-2 rounded-xl border border-slate-700 bg-gradient-to-br from-[#07131f] via-[#091923] to-[#03070c] p-2 shadow-2xl lg:gap-3 lg:p-3">
+          <header className="grid min-w-0 grid-cols-[minmax(240px,1fr)_auto] items-center gap-3 border-b border-white/10 pb-2">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="rounded-lg border border-white/10 bg-white/10 p-2">
+                <ShoppingBag className="h-[clamp(1.75rem,2.8vw,2.6rem)] w-[clamp(1.75rem,2.8vw,2.6rem)] text-slate-100" />
               </div>
-              <div>
-                <h1 className="text-3xl font-black tracking-normal">本日の受注モニター</h1>
+              <div className="min-w-0">
+                <h1 className="truncate text-[clamp(1.5rem,2.8vw,3rem)] font-black leading-tight tracking-normal">本日の受注モニター</h1>
               </div>
             </div>
 
-            <div className="flex items-center gap-5">
-              <nav className="flex items-center gap-2">
+            <div className="flex min-w-0 items-center justify-end gap-[clamp(0.5rem,1.3vw,1.25rem)]">
+              <nav className="flex shrink-0 items-center gap-2">
                 <Link
                   href="/orders"
-                  className="rounded-md border border-white/15 bg-white/10 px-3 py-2 text-sm font-black text-slate-100 hover:bg-white/15"
+                  className="rounded-md border border-white/15 bg-white/10 px-[clamp(0.55rem,1vw,0.85rem)] py-[clamp(0.45rem,0.8vw,0.65rem)] text-[clamp(0.72rem,0.9vw,0.9rem)] font-black text-slate-100 hover:bg-white/15"
                 >
                   注文一覧
                 </Link>
                 <Link
                   href="/orders/new"
-                  className="rounded-md border border-emerald-400/40 bg-emerald-500/20 px-3 py-2 text-sm font-black text-emerald-100 hover:bg-emerald-500/30"
+                  className="rounded-md border border-emerald-400/40 bg-emerald-500/20 px-[clamp(0.55rem,1vw,0.85rem)] py-[clamp(0.45rem,0.8vw,0.65rem)] text-[clamp(0.72rem,0.9vw,0.9rem)] font-black text-emerald-100 hover:bg-emerald-500/30"
                 >
                   注文登録
                 </Link>
               </nav>
-              <div className="h-12 w-px bg-white/15" />
-              <div className="flex items-baseline gap-4 whitespace-nowrap">
-                <div className="text-5xl font-black leading-none text-slate-100">
+              <div className="h-[clamp(2.2rem,4vw,4rem)] w-px bg-white/15" />
+              <div className="flex min-w-0 items-baseline gap-[clamp(0.45rem,1vw,1rem)] whitespace-nowrap">
+                <div className="text-[clamp(1.6rem,3.4vw,4.2rem)] font-black leading-none text-slate-100">
                   {now.toLocaleDateString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit", weekday: "short" })}
                 </div>
-                <div className="text-5xl font-black leading-none">{now.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" })}</div>
+                <div className="text-[clamp(1.6rem,3.4vw,4.2rem)] font-black leading-none">{now.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" })}</div>
               </div>
-              <div className="h-12 w-px bg-white/15" />
-              <div className="text-center">
-                <div className="text-sm font-bold text-slate-400">本日の注文</div>
-                <div className="text-3xl font-black">{orders.length}<span className="ml-1 text-lg">件</span></div>
+              <div className="h-[clamp(2.2rem,4vw,4rem)] w-px bg-white/15" />
+              <div className="shrink-0 text-center">
+                <div className="text-[clamp(0.7rem,0.9vw,0.9rem)] font-bold text-slate-400">本日の注文</div>
+                <div className="text-[clamp(1.45rem,2vw,2.25rem)] font-black">{orders.length}<span className="ml-1 text-[clamp(0.85rem,1vw,1.1rem)]">件</span></div>
               </div>
             </div>
           </header>
 
-          <div className="grid min-h-0 grid-cols-[1fr_360px] gap-3">
+          <div className="grid min-h-0 grid-cols-[minmax(0,1fr)_minmax(260px,29vw)] gap-2 lg:gap-3">
             <section
               className={`min-h-0 rounded-xl border p-3 ${
                 heroMode === "new"
@@ -129,24 +129,24 @@ export default function MonitorPage() {
             <ProductPanel stats={remainingStats} compact />
           </div>
 
-          <div className="grid min-h-0 grid-cols-[1fr_360px] gap-3">
-            <section className="grid min-h-0 grid-rows-[auto_1fr] gap-3">
+          <div className="grid min-h-0 grid-cols-[minmax(0,1fr)_minmax(260px,29vw)] gap-2 lg:gap-3">
+            <section className="grid min-h-0 grid-rows-[auto_1fr] gap-2 lg:gap-3">
               <div className="space-y-2">
-                <div className="grid grid-cols-5 gap-2">
+                <div className="grid grid-cols-5 gap-1.5 lg:gap-2">
                   <MonitorStatusCard label="新規" count={stats.statusCounts.new} tone="red" icon={<ClipboardPlus />} />
                   <MonitorStatusCard label="確認済み" count={stats.statusCounts.confirmed} tone="amber" icon={<CheckCircle2 />} />
                   <MonitorStatusCard label="調理中" count={stats.statusCounts.cooking} tone="blue" icon={<CookingPot />} />
                   <MonitorStatusCard label="完了" count={stats.statusCounts.completed} tone="green" icon={<PackageCheck />} />
                   <MonitorStatusCard label="中止" count={stats.statusCounts.cancelled} tone="slate" icon={<X />} />
                 </div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-1.5 lg:gap-2">
                   <MonitorStatusCard label="店頭受取" count={stats.pickupCount} tone="slate" icon={<ShoppingBag />} />
                   <MonitorStatusCard label="配達" count={stats.deliveryCount} tone="violet" icon={<Truck />} />
                 </div>
               </div>
 
               <section className="min-h-0 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04]">
-                <div className="grid grid-cols-[90px_1.1fr_1.45fr_80px_100px_1fr] gap-2 border-b border-white/10 bg-white/[0.04] px-3 py-2 text-sm font-black text-slate-300">
+                <div className="grid grid-cols-[70px_minmax(88px,1fr)_minmax(120px,1.45fr)_54px_66px_minmax(90px,1fr)] gap-2 border-b border-white/10 bg-white/[0.04] px-3 py-1.5 text-[clamp(0.72rem,0.9vw,0.9rem)] font-black text-slate-300 xl:grid-cols-[82px_1.1fr_1.45fr_70px_88px_1fr]">
                   <div>時間</div>
                   <div>注文者</div>
                   <div>商品</div>
@@ -162,7 +162,7 @@ export default function MonitorPage() {
               </section>
             </section>
 
-            <aside className="grid min-h-0 grid-rows-[1fr_1fr] gap-3">
+            <aside className="grid min-h-0 grid-rows-[1fr_1fr] gap-2 lg:gap-3">
               <UpcomingPanel orders={upcomingOrders} now={now} />
               <DeliveryPanel orders={deliveryOrders} />
             </aside>
@@ -184,27 +184,27 @@ function NewOrderHero({ order, flash, mode }: { order: OrderWithRelations; flash
   const dividerClass = isNew ? "border-red-300/30" : "border-sky-300/30";
 
   return (
-    <div className={`grid h-full grid-cols-[92px_1fr] items-center gap-3 ${flash ? "animate-pulse" : ""}`}>
-      <div className={`flex h-20 w-20 items-center justify-center rounded-full text-white ${iconClass}`}>
-        {isNew ? <Bell className="h-11 w-11" /> : <Clock className="h-11 w-11" />}
+    <div className={`grid h-full grid-cols-[clamp(58px,6vw,92px)_minmax(0,1fr)] items-center gap-2 lg:gap-3 ${flash ? "animate-pulse" : ""}`}>
+      <div className={`flex h-[clamp(58px,6vw,80px)] w-[clamp(58px,6vw,80px)] items-center justify-center rounded-full text-white ${iconClass}`}>
+        {isNew ? <Bell className="h-[clamp(2rem,3vw,2.75rem)] w-[clamp(2rem,3vw,2.75rem)]" /> : <Clock className="h-[clamp(2rem,3vw,2.75rem)] w-[clamp(2rem,3vw,2.75rem)]" />}
       </div>
       <div className="min-w-0">
-        <div className="mb-2 flex items-center gap-3">
-          <span className={`rounded-md px-2.5 py-1 text-sm font-black text-white ${badgeClass}`}>
+        <div className="mb-2 flex min-w-0 items-center gap-2 lg:gap-3">
+          <span className={`shrink-0 rounded-md px-2 py-1 text-[clamp(0.7rem,0.9vw,0.9rem)] font-black text-white ${badgeClass}`}>
             {isNew ? "NEW ORDER" : "ACTIVE ORDER"}
           </span>
-          <span className="rounded-md border border-white/15 bg-white/10 px-2.5 py-1 text-sm font-black text-slate-100">
+          <span className="shrink-0 rounded-md border border-white/15 bg-white/10 px-2 py-1 text-[clamp(0.7rem,0.9vw,0.9rem)] font-black text-slate-100">
             {displayShortOrderNumber(order)}
           </span>
-          <span className="truncate text-2xl font-black">{isNew ? "新着注文！" : "最新の未完了注文"}</span>
+          <span className="truncate text-[clamp(1.2rem,1.8vw,1.6rem)] font-black">{isNew ? "新着注文！" : "最新の未完了注文"}</span>
         </div>
-        <div className={`grid grid-cols-[110px_1.15fr_1.4fr_82px_1fr] gap-4 border-t pt-2 ${dividerClass}`}>
+        <div className={`grid grid-cols-[82px_minmax(90px,1fr)_minmax(120px,1.4fr)_62px_minmax(80px,1fr)] gap-2 border-t pt-2 lg:gap-3 ${dividerClass}`}>
           <HeroField label="受付時刻" value={displayTime(order.pickup_time)} large />
           <HeroField label="注文者" value={order.customer_name} />
           <HeroField label="商品・数量" value={mainItem ? itemText : "-"} />
           <div className="min-w-0">
-            <div className="text-sm font-black text-slate-300">受取</div>
-            <span className={`mt-1 inline-flex rounded-md px-2 py-1 text-base font-black leading-none text-white ${badgeClass}`}>
+            <div className="text-[clamp(0.68rem,0.85vw,0.85rem)] font-black text-slate-300">受取</div>
+            <span className={`mt-1 inline-flex max-w-full rounded-md px-2 py-1 text-[clamp(0.78rem,1vw,1rem)] font-black leading-none text-white ${badgeClass}`}>
               {receiveTypeLabels[order.receive_type]}
             </span>
           </div>
@@ -236,8 +236,8 @@ function HeroField({
 }) {
   return (
     <div className="min-w-0">
-      <div className="text-sm font-black text-slate-300">{label}</div>
-      <div className={`mt-0.5 truncate font-black ${large ? "text-3xl" : "text-2xl"} ${accent ? "text-red-300" : "text-white"}`}>
+      <div className="text-[clamp(0.68rem,0.85vw,0.85rem)] font-black text-slate-300">{label}</div>
+      <div className={`mt-0.5 truncate font-black ${large ? "text-[clamp(1.3rem,2vw,2rem)]" : "text-[clamp(1.05rem,1.6vw,1.55rem)]"} ${accent ? "text-red-300" : "text-white"}`}>
         {value}
       </div>
     </div>
@@ -265,11 +265,11 @@ function MonitorStatusCard({
   };
 
   return (
-    <div className={`flex items-center gap-3 rounded-lg border p-3 ${tones[tone]}`}>
-      <div className="[&>svg]:h-8 [&>svg]:w-8">{icon}</div>
-      <div>
-        <div className="text-base font-black">{label}</div>
-        <div className="text-3xl font-black">{count}<span className="ml-1 text-base">件</span></div>
+    <div className={`flex min-w-0 items-center gap-2 rounded-lg border p-2 xl:gap-3 xl:p-3 ${tones[tone]}`}>
+      <div className="shrink-0 [&>svg]:h-[clamp(1.6rem,2.2vw,2rem)] [&>svg]:w-[clamp(1.6rem,2.2vw,2rem)]">{icon}</div>
+      <div className="min-w-0">
+        <div className="truncate text-[clamp(0.82rem,1vw,1rem)] font-black">{label}</div>
+        <div className="text-[clamp(1.6rem,2.4vw,2.2rem)] font-black leading-tight">{count}<span className="ml-1 text-[clamp(0.75rem,1vw,1rem)]">件</span></div>
       </div>
     </div>
   );
@@ -282,20 +282,20 @@ function MonitorOrderRow({ order, flash }: { order: OrderWithRelations; flash: b
 
   return (
     <div
-      className={`grid grid-cols-[90px_1.1fr_1.45fr_80px_100px_1fr] gap-2 border-b border-white/10 px-3 py-2 ${
+      className={`grid grid-cols-[70px_minmax(88px,1fr)_minmax(120px,1.45fr)_54px_66px_minmax(90px,1fr)] gap-2 border-b border-white/10 px-3 py-1.5 xl:grid-cols-[82px_1.1fr_1.45fr_70px_88px_1fr] ${
         isAlert ? "bg-red-500/10" : ""
       }`}
     >
       <div>
-        <div className="text-xs font-black text-slate-400">{displayShortOrderNumber(order)}</div>
-        <div className={`text-xl font-black ${isAlert ? "text-red-300" : "text-slate-100"}`}>{displayTime(order.pickup_time)}</div>
+        <div className="text-[clamp(0.65rem,0.8vw,0.78rem)] font-black text-slate-400">{displayShortOrderNumber(order)}</div>
+        <div className={`text-[clamp(1rem,1.4vw,1.25rem)] font-black ${isAlert ? "text-red-300" : "text-slate-100"}`}>{displayTime(order.pickup_time)}</div>
       </div>
-      <div className="truncate text-base font-black text-white">{order.customer_name}</div>
-      <div className="truncate text-base font-bold text-slate-100">{itemSummary}</div>
-      <div className="text-base font-black text-white">x {quantity}</div>
-      <div className="text-base font-black text-slate-100">{receiveTypeLabels[order.receive_type]}</div>
-      <div className="flex items-center justify-between gap-3">
-        <div className="truncate text-base font-bold text-slate-300">{order.note || order.delivery_address || "-"}</div>
+      <div className="truncate text-[clamp(0.86rem,1.05vw,1rem)] font-black text-white">{order.customer_name}</div>
+      <div className="truncate text-[clamp(0.86rem,1.05vw,1rem)] font-bold text-slate-100">{itemSummary}</div>
+      <div className="text-[clamp(0.86rem,1.05vw,1rem)] font-black text-white">x {quantity}</div>
+      <div className="text-[clamp(0.86rem,1.05vw,1rem)] font-black text-slate-100">{receiveTypeLabels[order.receive_type]}</div>
+      <div className="flex min-w-0 items-center justify-between gap-2">
+        <div className="truncate text-[clamp(0.82rem,1vw,1rem)] font-bold text-slate-300">{order.note || order.delivery_address || "-"}</div>
         <StatusBadge status={order.status} strong />
       </div>
     </div>
@@ -304,16 +304,16 @@ function MonitorOrderRow({ order, flash }: { order: OrderWithRelations; flash: b
 
 function ProductPanel({ stats, compact = false }: { stats: ReturnType<typeof summarizeRemainingOrders>; compact?: boolean }) {
   return (
-    <section className="min-h-0 rounded-xl border border-white/10 bg-white/[0.04] p-3">
+    <section className="min-h-0 rounded-xl border border-white/10 bg-white/[0.04] p-2 xl:p-3">
       <div className="mb-2 flex items-end justify-between">
-        <h2 className={compact ? "text-xl font-black" : "text-2xl font-black"}>商品別合計</h2>
-        <div className="text-base font-black text-slate-300">残り {stats.totalItems} 個</div>
+        <h2 className={compact ? "text-[clamp(1rem,1.4vw,1.25rem)] font-black" : "text-[clamp(1.2rem,1.8vw,1.5rem)] font-black"}>商品別合計</h2>
+        <div className="text-[clamp(0.78rem,1vw,1rem)] font-black text-slate-300">残り {stats.totalItems} 個</div>
       </div>
       <div className="space-y-1.5">
         {stats.productTotals.slice(0, compact ? 4 : 8).map((item) => (
           <div key={item.product_name} className="flex items-center justify-between border-t border-white/10 pt-1.5">
-            <div className="truncate text-base font-bold text-slate-100">{item.product_name}</div>
-            <div className="text-2xl font-black text-white">{item.quantity}<span className="ml-1 text-xs">個</span></div>
+            <div className="truncate text-[clamp(0.85rem,1.05vw,1rem)] font-bold text-slate-100">{item.product_name}</div>
+            <div className="shrink-0 text-[clamp(1.3rem,1.8vw,1.6rem)] font-black text-white">{item.quantity}<span className="ml-1 text-xs">個</span></div>
           </div>
         ))}
       </div>
@@ -323,9 +323,9 @@ function ProductPanel({ stats, compact = false }: { stats: ReturnType<typeof sum
 
 function UpcomingPanel({ orders, now }: { orders: OrderWithRelations[]; now: Date }) {
   return (
-    <section className="min-h-0 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] p-3">
+    <section className="min-h-0 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] p-2 xl:p-3">
       <div className="mb-2">
-        <h2 className="flex min-w-0 items-center truncate text-base font-black leading-tight">
+        <h2 className="flex min-w-0 items-center truncate text-[clamp(0.95rem,1.2vw,1.1rem)] font-black leading-tight">
           <span className="truncate">まもなく受け渡し</span>
         </h2>
       </div>
@@ -341,9 +341,9 @@ function UpcomingPanel({ orders, now }: { orders: OrderWithRelations[]; now: Dat
 
 function DeliveryPanel({ orders }: { orders: OrderWithRelations[] }) {
   return (
-    <section className="min-h-0 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] p-3">
+    <section className="min-h-0 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] p-2 xl:p-3">
       <div className="mb-2">
-        <h2 className="flex min-w-0 items-center truncate text-base font-black leading-tight">
+        <h2 className="flex min-w-0 items-center truncate text-[clamp(0.95rem,1.2vw,1.1rem)] font-black leading-tight">
           <span className="truncate">配達予定</span>
         </h2>
       </div>
@@ -360,14 +360,14 @@ function DeliveryPanel({ orders }: { orders: OrderWithRelations[] }) {
 function SideOrder({ order, sub }: { order: OrderWithRelations; sub: string }) {
   const itemText = order.items.map((item) => `${item.product_name} x${item.quantity}`).join(" / ");
   return (
-    <div className="grid grid-cols-[62px_1fr_auto] gap-2 border-t border-white/10 pt-2">
-      <div className="text-base font-black text-red-300">{displayTime(order.pickup_time)}</div>
+    <div className="grid grid-cols-[52px_minmax(0,1fr)_auto] gap-2 border-t border-white/10 pt-2 xl:grid-cols-[62px_minmax(0,1fr)_auto]">
+      <div className="text-[clamp(0.85rem,1vw,1rem)] font-black text-red-300">{displayTime(order.pickup_time)}</div>
       <div className="min-w-0">
-        <div className="truncate text-base font-black text-white">{order.customer_name}</div>
-        <div className="truncate text-sm font-bold text-slate-300">{itemText}</div>
-        <div className="truncate text-xs font-bold text-red-300">{sub}</div>
+        <div className="truncate text-[clamp(0.85rem,1vw,1rem)] font-black text-white">{order.customer_name}</div>
+        <div className="truncate text-[clamp(0.72rem,0.9vw,0.88rem)] font-bold text-slate-300">{itemText}</div>
+        <div className="truncate text-[clamp(0.68rem,0.8vw,0.75rem)] font-bold text-red-300">{sub}</div>
       </div>
-      <div className="self-center rounded-md bg-slate-700 px-2 py-1 text-xs font-black">{receiveTypeLabels[order.receive_type]}</div>
+      <div className="self-center rounded-md bg-slate-700 px-2 py-1 text-[clamp(0.65rem,0.8vw,0.75rem)] font-black">{receiveTypeLabels[order.receive_type]}</div>
     </div>
   );
 }
