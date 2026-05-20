@@ -105,22 +105,22 @@ function OrderListRow({
         }}
         className="block w-full px-3 py-2 text-left lg:hidden"
       >
-        <div className="flex items-center justify-between gap-3">
+        <div className="space-y-2">
           <div className="min-w-0">
-            <div className="flex min-w-0 items-center gap-2">
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
               <span className="text-xs font-black text-slate-500">{displayShortOrderNumber(order)}</span>
               <span className={`text-lg font-black ${soon ? "text-red-600" : "text-slate-950"}`}>{displayTime(order.pickup_time)}</span>
               <span
                 className={
                   order.receive_type === "delivery"
-                    ? "rounded-md bg-violet-100 px-2 py-0.5 text-xs font-black text-violet-800"
-                    : "rounded-md bg-slate-100 px-2 py-0.5 text-xs font-black text-slate-700"
+                    ? "shrink-0 whitespace-nowrap rounded-md bg-violet-100 px-2 py-0.5 text-xs font-black text-violet-800"
+                    : "shrink-0 whitespace-nowrap rounded-md bg-slate-100 px-2 py-0.5 text-xs font-black text-slate-700"
                 }
               >
                 {receiveTypeLabels[order.receive_type]}
               </span>
               {isDeleted ? (
-                <span className="rounded-md border border-slate-300 bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-600">削除済み</span>
+                <span className="shrink-0 whitespace-nowrap rounded-md border border-slate-300 bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-600">削除済み</span>
               ) : (
                 <CompactStatus status={order.status} />
               )}
@@ -128,7 +128,7 @@ function OrderListRow({
             <div className="mt-1 truncate text-base font-black text-slate-950">{order.customer_name}</div>
             <ProductChips order={order} mobile />
           </div>
-          <div className="grid shrink-0 grid-cols-2 items-center gap-2">
+          <div className="flex items-center justify-end gap-2">
             <span className="rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-center text-xs font-black text-slate-700 shadow-sm">
               詳細
             </span>
@@ -139,7 +139,7 @@ function OrderListRow({
                 onKeyDown={(event) => {
                   event.stopPropagation();
                 }}
-                className="rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-black text-slate-900 shadow-sm"
+                className="min-w-[96px] rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-black text-slate-900 shadow-sm"
               >
                 {savingStatus ? "更新中" : statusLabels[nextStatus]}
               </button>
@@ -251,7 +251,7 @@ function ProductChips({ order, mobile = false }: { order: OrderWithRelations; mo
 
 function CompactStatus({ status }: { status: OrderStatus }) {
   return (
-    <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-black ${statusSoftStyles[status]}`}>
+    <span className={`inline-flex shrink-0 items-center whitespace-nowrap rounded-md border px-2 py-0.5 text-xs font-black ${statusSoftStyles[status]}`}>
       {statusLabels[status]}
     </span>
   );
