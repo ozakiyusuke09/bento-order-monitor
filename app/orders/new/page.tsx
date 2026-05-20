@@ -1,7 +1,9 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { useState } from "react";
+import type { FormEvent, ReactNode } from "react";
 import { useRouter } from "next/navigation";
+import { CalendarDays, Clock, CreditCard, MapPin, Phone, StickyNote, UserRound } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { AuthGuard } from "@/components/auth-guard";
 import { blankOrderItem, OrderItemsEditor, type OrderItemFormValue } from "@/components/order-items-editor";
@@ -73,79 +75,108 @@ export default function NewOrderPage() {
   return (
     <AuthGuard>
       <AppShell>
-        <main className="mx-auto max-w-4xl px-4 pb-44 pt-6 sm:pb-10">
-          <div className="mb-5">
-            <div className="text-sm font-bold text-slate-500">電話・LINE・メール注文を手入力</div>
-            <h1 className="text-3xl font-black text-slate-950">注文登録</h1>
+        <main className="mx-auto max-w-[1120px] px-4 pb-44 pt-3 sm:px-6 sm:pb-10 lg:px-8 lg:pt-5">
+          <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <div className="text-sm font-bold text-slate-500">新規注文</div>
+              <h1 className="text-2xl font-black leading-tight tracking-normal text-slate-950 sm:text-3xl">注文登録</h1>
+            </div>
+            <div className="hidden rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-black text-slate-700 shadow-[0_1px_2px_rgba(15,23,42,0.04)] sm:block">
+              {pickupDate} {pickupTime}
+            </div>
           </div>
 
-          <form onSubmit={submit} noValidate className="space-y-5">
-            <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-soft">
-              <h2 className="text-xl font-black text-slate-950">基本情報</h2>
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <Input label="注文者名" value={customerName} onChange={setCustomerName} required />
-                <Input label="電話番号" value={phone} onChange={setPhone} />
-                <Input label="受取日" type="date" value={pickupDate} onChange={setPickupDate} required />
-                <Input label="受取時間" type="time" value={pickupTime} onChange={setPickupTime} required />
-                <label>
-                  <span className="text-sm font-bold text-slate-700">受取方法</span>
-                  <select
-                    value={receiveType}
-                    onChange={(event) => setReceiveType(event.target.value as "pickup" | "delivery")}
-                    className="mt-1 h-12 w-full rounded-md border border-slate-300 px-3"
-                  >
-                    <option value="pickup">店頭</option>
-                    <option value="delivery">配達</option>
-                  </select>
-                </label>
-                <label>
-                  <span className="text-sm font-bold text-slate-700">支払い方法</span>
-                  <select
-                    value={paymentMethod}
-                    onChange={(event) => setPaymentMethod(event.target.value)}
-                    className="mt-1 h-12 w-full rounded-md border border-slate-300 px-3"
-                  >
-                    <option value="cash">現金</option>
-                    <option value="invoice">請求</option>
-                    <option value="cashless">キャッシュレス</option>
-                    <option value="other">その他</option>
-                  </select>
-                </label>
+          <form onSubmit={submit} noValidate className="grid gap-4 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:items-start">
+            <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+              <div className="border-b border-slate-200 bg-slate-50/80 px-4 py-2.5">
+                <h2 className="text-sm font-black text-slate-600">基本情報</h2>
+              </div>
+              <div className="grid gap-x-3 gap-y-3 p-4 sm:grid-cols-2">
+                <Input icon={<UserRound className="h-4 w-4" />} label="注文者名" value={customerName} onChange={setCustomerName} required />
+                <Input icon={<Phone className="h-4 w-4" />} label="電話番号" value={phone} onChange={setPhone} />
+                <Input icon={<CalendarDays className="h-4 w-4" />} label="受取日" type="date" value={pickupDate} onChange={setPickupDate} required />
+                <Input icon={<Clock className="h-4 w-4" />} label="受取時間" type="time" value={pickupTime} onChange={setPickupTime} required />
+                <div>
+                  <span className="mb-1.5 block text-xs font-black text-slate-500">受取方法</span>
+                  <div className="grid grid-cols-2 gap-1 rounded-md border border-slate-200 bg-slate-50 p-1">
+                    <button
+                      type="button"
+                      onClick={() => setReceiveType("pickup")}
+                      className={
+                        receiveType === "pickup"
+                          ? "h-10 rounded bg-slate-950 text-sm font-black text-white"
+                          : "h-10 rounded text-sm font-black text-slate-700 hover:bg-white"
+                      }
+                    >
+                      店頭
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setReceiveType("delivery")}
+                      className={
+                        receiveType === "delivery"
+                          ? "h-10 rounded bg-slate-950 text-sm font-black text-white"
+                          : "h-10 rounded text-sm font-black text-slate-700 hover:bg-white"
+                      }
+                    >
+                      配達
+                    </button>
+                  </div>
+                </div>
+                <Select
+                  icon={<CreditCard className="h-4 w-4" />}
+                  label="支払い方法"
+                  value={paymentMethod}
+                  onChange={setPaymentMethod}
+                  options={[
+                    { value: "cash", label: "現金" },
+                    { value: "invoice", label: "請求" },
+                    { value: "cashless", label: "キャッシュレス" },
+                    { value: "other", label: "その他" }
+                  ]}
+                />
               </div>
               {receiveType === "delivery" ? (
-                <div className="mt-4">
-                  <Input label="配達先（任意）" value={deliveryAddress} onChange={setDeliveryAddress} />
+                <div className="border-t border-slate-100 px-4 pb-4 pt-4">
+                  <Input icon={<MapPin className="h-4 w-4" />} label="配達先（任意）" value={deliveryAddress} onChange={setDeliveryAddress} />
                 </div>
               ) : null}
-              <label className="mt-4 block">
-                <span className="text-sm font-bold text-slate-700">備考</span>
-                <textarea
-                  value={note}
-                  onChange={(event) => setNote(event.target.value)}
-                  rows={3}
-                  className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2"
-                />
-              </label>
-              <div className="mt-4 rounded-md border border-dashed border-slate-300 bg-slate-50 p-4 text-sm font-bold text-slate-500">
-                画像・ファイル添付は登録後の注文詳細画面から追加できます。
+              <div className="border-t border-slate-100 p-4">
+                <label className="block">
+                  <span className="mb-1.5 flex items-center gap-1.5 text-xs font-black text-slate-500">
+                    <StickyNote className="h-4 w-4" />
+                    備考
+                  </span>
+                  <textarea
+                    value={note}
+                    onChange={(event) => setNote(event.target.value)}
+                    rows={3}
+                    className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900 outline-none focus:border-slate-400"
+                  />
+                </label>
+                <div className="mt-3 rounded-md border border-dashed border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-500">
+                  添付は登録後の詳細画面から追加できます。
+                </div>
               </div>
             </section>
 
-            <OrderItemsEditor items={items} onItemsChange={setItems} saving={saving} submitLabel="注文を登録" savingLabel="登録中..." />
+            <div className="space-y-4">
+              <OrderItemsEditor items={items} onItemsChange={setItems} saving={saving} submitLabel="注文を登録" savingLabel="登録中..." />
 
-            {error ? (
-              <div className="rounded-md border border-red-200 bg-red-50 p-4 font-bold text-red-700" role="alert">
-                {error}
-              </div>
-            ) : null}
+              {error ? (
+                <div className="rounded-md border border-red-200 bg-red-50 p-4 font-bold text-red-700" role="alert">
+                  {error}
+                </div>
+              ) : null}
 
-            <button
-              type="submit"
-              disabled={saving}
-              className="hidden h-14 w-full rounded-md bg-slate-950 px-5 text-lg font-black text-white disabled:opacity-60 sm:block"
-            >
-              {saving ? "登録中..." : "注文を登録"}
-            </button>
+              <button
+                type="submit"
+                disabled={saving}
+                className="hidden h-12 w-full rounded-md bg-slate-950 px-5 text-base font-black text-white shadow-sm hover:bg-slate-800 disabled:opacity-60 sm:block"
+              >
+                {saving ? "登録中..." : "注文を登録"}
+              </button>
+            </div>
           </form>
         </main>
       </AppShell>
@@ -154,12 +185,14 @@ export default function NewOrderPage() {
 }
 
 function Input({
+  icon,
   label,
   value,
   onChange,
   type = "text",
   required = false
 }: {
+  icon?: ReactNode;
   label: string;
   value: string;
   onChange: (value: string) => void;
@@ -168,14 +201,51 @@ function Input({
 }) {
   return (
     <label className="block">
-      <span className="text-sm font-bold text-slate-700">{label}</span>
+      <span className="mb-1.5 flex items-center gap-1.5 text-xs font-black text-slate-500">
+        {icon}
+        {label}
+      </span>
       <input
         type={type}
         required={required}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-1 h-12 w-full rounded-md border border-slate-300 px-3"
+        className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-900 outline-none focus:border-slate-400"
       />
+    </label>
+  );
+}
+
+function Select({
+  icon,
+  label,
+  value,
+  onChange,
+  options
+}: {
+  icon?: ReactNode;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: { value: string; label: string }[];
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1.5 flex items-center gap-1.5 text-xs font-black text-slate-500">
+        {icon}
+        {label}
+      </span>
+      <select
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-900 outline-none focus:border-slate-400"
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
     </label>
   );
 }
