@@ -108,6 +108,18 @@ export default function OrdersPage() {
                     : "-"}
                 </span>
               </div>
+              <label className="hidden items-center gap-2 text-sm font-bold text-slate-600 lg:flex">
+                <CalendarDays className="h-4 w-4" />
+                日付指定
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(event) => {
+                    window.location.href = `/orders?date=${event.target.value}`;
+                  }}
+                  className="h-10 w-36 rounded-md border border-slate-300 px-2"
+                />
+              </label>
               <button
                 type="button"
                 onClick={refresh}
@@ -128,35 +140,22 @@ export default function OrdersPage() {
             </span>
           </div>
 
-          <div className="mb-3 grid grid-cols-4 gap-1 rounded-lg border border-slate-200 bg-white p-2 shadow-sm sm:mb-4 sm:flex sm:flex-wrap sm:gap-2 sm:p-3">
-            <NavPill href={`/orders?date=${selectedDate || today}`} active={mode === "date" && !activeFilter} label="すべて" />
-            <NavPill
-              href={`/orders?date=${selectedDate || today}&handoff=before`}
-              active={mode === "date" && activeFilter?.type === "handoff" && activeFilter.value === "before"}
-              label="受渡前"
-            />
-            <NavPill
-              href={`/orders?date=${selectedDate || today}&handoff=done`}
-              active={mode === "date" && activeFilter?.type === "handoff" && activeFilter.value === "done"}
-              label="受渡済"
-            />
-            <NavPill href="/orders?view=history" active={mode === "past"} label="履歴" />
-            <label className="col-span-4 mt-1 hidden items-center gap-2 text-sm font-bold text-slate-600 sm:ml-auto sm:mt-0 sm:flex">
-              <CalendarDays className="h-4 w-4" />
-              日付指定
-              <input
-                type="date"
-                value={selectedDate}
-                onChange={(event) => {
-                  window.location.href = `/orders?date=${event.target.value}`;
-                }}
-                className="h-9 rounded-md border border-slate-300 px-2"
-              />
-            </label>
-          </div>
-
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_430px] lg:items-stretch">
             <div className="space-y-4">
+              <div className="grid grid-cols-4 gap-1 rounded-lg border border-slate-200 bg-white p-2 shadow-sm sm:inline-grid sm:w-auto sm:grid-cols-4">
+                <NavPill href={`/orders?date=${selectedDate || today}`} active={mode === "date" && !activeFilter} label="すべて" />
+                <NavPill
+                  href={`/orders?date=${selectedDate || today}&handoff=before`}
+                  active={mode === "date" && activeFilter?.type === "handoff" && activeFilter.value === "before"}
+                  label="受渡前"
+                />
+                <NavPill
+                  href={`/orders?date=${selectedDate || today}&handoff=done`}
+                  active={mode === "date" && activeFilter?.type === "handoff" && activeFilter.value === "done"}
+                  label="受渡済"
+                />
+                <NavPill href="/orders?view=history" active={mode === "past"} label="履歴" />
+              </div>
               <div className="lg:hidden">
                 <DailyRequiredSummary stats={remainingStats} />
               </div>
