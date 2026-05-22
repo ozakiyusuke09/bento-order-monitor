@@ -180,7 +180,7 @@ function NewOrderHero({ order, flash, mode }: { order: OrderWithRelations; flash
       <div className={`flex h-11 w-11 items-center justify-center rounded-full text-white ${iconClass}`}>
         {isNew ? <Bell className="h-6 w-6" /> : <Clock className="h-6 w-6" />}
       </div>
-      <div className={`grid min-w-0 grid-cols-[minmax(150px,0.9fr)_70px_minmax(92px,0.8fr)_minmax(160px,1.6fr)_58px_minmax(80px,0.8fr)] items-center gap-2 border-l pl-2 lg:gap-3 ${dividerClass}`}>
+      <div className={`grid min-w-0 grid-cols-[minmax(88px,0.55fr)_70px_minmax(92px,0.8fr)_minmax(160px,1.6fr)_58px_minmax(80px,0.8fr)] items-center gap-2 border-l pl-2 lg:gap-3 ${dividerClass}`}>
         <div className="flex min-w-0 items-center gap-1.5">
           <span className={`shrink-0 rounded px-1.5 py-0.5 text-[0.68rem] font-black leading-none text-white ${badgeClass}`}>
             {isNew ? "NEW" : "ACTIVE"}
@@ -188,7 +188,6 @@ function NewOrderHero({ order, flash, mode }: { order: OrderWithRelations; flash
           <span className="shrink-0 rounded border border-white/15 bg-white/10 px-1.5 py-0.5 text-[0.68rem] font-black leading-none text-slate-100">
             {displayShortOrderNumber(order)}
           </span>
-          <span className="truncate text-[clamp(0.9rem,1.2vw,1.15rem)] font-black">{isNew ? "新着注文" : "未完了注文"}</span>
         </div>
         <HeroField label="受付" value={displayTime(order.pickup_time)} large />
         <HeroField label="注文者" value={order.customer_name} />
