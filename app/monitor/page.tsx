@@ -138,7 +138,7 @@ export default function MonitorPage() {
               </div>
 
               <section className="min-h-0 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04]">
-                <div className="grid grid-cols-[70px_minmax(88px,1fr)_minmax(120px,1.45fr)_54px_66px_minmax(90px,1fr)] gap-2 border-b border-white/10 bg-white/[0.04] px-3 py-1.5 text-[clamp(0.72rem,0.9vw,0.9rem)] font-black text-slate-300 xl:grid-cols-[82px_1.1fr_1.45fr_70px_88px_1fr]">
+                <div className="grid grid-cols-[86px_minmax(96px,1fr)_minmax(220px,2fr)_64px_74px_minmax(110px,1fr)] gap-3 border-b border-white/10 bg-white/[0.04] px-3 py-2 text-[clamp(0.8rem,1vw,0.95rem)] font-black text-slate-300 xl:grid-cols-[96px_1fr_2.05fr_78px_92px_1fr]">
                   <div>時間</div>
                   <div>注文者</div>
                   <div>商品</div>
@@ -262,28 +262,47 @@ function MonitorStatusCard({
 }
 
 function MonitorOrderRow({ order, flash }: { order: OrderWithRelations; flash: boolean }) {
-  const itemSummary = order.items.map((item) => item.product_name).join(" / ");
   const quantity = order.items.reduce((sum, item) => sum + item.quantity, 0);
   const isAlert = order.status === "new" || flash;
 
   return (
     <div
-      className={`grid grid-cols-[70px_minmax(88px,1fr)_minmax(120px,1.45fr)_54px_66px_minmax(90px,1fr)] gap-2 border-b border-white/10 px-3 py-1.5 xl:grid-cols-[82px_1.1fr_1.45fr_70px_88px_1fr] ${
+      className={`grid grid-cols-[86px_minmax(96px,1fr)_minmax(220px,2fr)_64px_74px_minmax(110px,1fr)] items-center gap-3 border-b border-white/10 px-3 py-2.5 xl:grid-cols-[96px_1fr_2.05fr_78px_92px_1fr] ${
         isAlert ? "bg-red-500/10" : ""
       }`}
     >
       <div>
-        <div className="text-[clamp(0.65rem,0.8vw,0.78rem)] font-black text-slate-400">{displayShortOrderNumber(order)}</div>
-        <div className={`text-[clamp(1rem,1.4vw,1.25rem)] font-black ${isAlert ? "text-red-300" : "text-slate-100"}`}>{displayTime(order.pickup_time)}</div>
+        <div className="text-[clamp(0.7rem,0.9vw,0.86rem)] font-black text-slate-400">{displayShortOrderNumber(order)}</div>
+        <div className={`text-[clamp(1.18rem,1.65vw,1.55rem)] font-black leading-tight ${isAlert ? "text-red-300" : "text-slate-100"}`}>{displayTime(order.pickup_time)}</div>
       </div>
-      <div className="truncate text-[clamp(0.86rem,1.05vw,1rem)] font-black text-white">{order.customer_name}</div>
-      <div className="truncate text-[clamp(0.86rem,1.05vw,1rem)] font-bold text-slate-100">{itemSummary}</div>
-      <div className="text-[clamp(0.86rem,1.05vw,1rem)] font-black text-white">x {quantity}</div>
-      <div className="text-[clamp(0.86rem,1.05vw,1rem)] font-black text-slate-100">{receiveTypeLabels[order.receive_type]}</div>
+      <div className="truncate text-[clamp(1rem,1.25vw,1.18rem)] font-black text-white">{order.customer_name}</div>
+      <MonitorItemBreakdown order={order} />
+      <div className="text-[clamp(1rem,1.3vw,1.2rem)] font-black text-white">x {quantity}</div>
+      <div className="text-[clamp(1rem,1.2vw,1.15rem)] font-black text-slate-100">{receiveTypeLabels[order.receive_type]}</div>
       <div className="flex min-w-0 items-center justify-between gap-2">
-        <div className="truncate text-[clamp(0.82rem,1vw,1rem)] font-bold text-slate-300">{order.note || order.delivery_address || "-"}</div>
+        <div className="truncate text-[clamp(0.94rem,1.15vw,1.08rem)] font-bold text-slate-300">{order.note || order.delivery_address || "-"}</div>
         <StatusBadge status={order.status} strong />
       </div>
+    </div>
+  );
+}
+
+function MonitorItemBreakdown({ order }: { order: OrderWithRelations }) {
+  if (order.items.length === 0) {
+    return <div className="text-[clamp(1rem,1.2vw,1.1rem)] font-bold text-slate-400">-</div>;
+  }
+
+  return (
+    <div className="flex min-w-0 flex-wrap gap-1.5">
+      {order.items.map((item) => (
+        <span
+          key={item.id}
+          className="inline-flex max-w-full items-center gap-1 rounded-md border border-white/10 bg-white/[0.06] px-2 py-1 text-[clamp(0.95rem,1.16vw,1.08rem)] font-black leading-tight text-slate-50"
+        >
+          <span className="truncate">{item.product_name}</span>
+          <span className="shrink-0 text-red-200">x{item.quantity}</span>
+        </span>
+      ))}
     </div>
   );
 }
