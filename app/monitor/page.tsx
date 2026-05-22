@@ -73,7 +73,7 @@ export default function MonitorPage() {
                 <ShoppingBag className="h-[clamp(1.75rem,2.8vw,2.6rem)] w-[clamp(1.75rem,2.8vw,2.6rem)] text-slate-100" />
               </div>
               <div className="min-w-0">
-                <h1 className="truncate text-[clamp(1.5rem,2.8vw,3rem)] font-black leading-tight tracking-normal">本日の受注モニター</h1>
+                <h1 className="truncate text-[clamp(1.5rem,2.8vw,3rem)] font-black leading-tight tracking-normal">受注モニター</h1>
               </div>
             </div>
 
