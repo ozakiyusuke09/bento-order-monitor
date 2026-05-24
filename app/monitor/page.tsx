@@ -28,10 +28,19 @@ export default function MonitorPage() {
   const [newOrderNotice, setNewOrderNotice] = useState(false);
   const seenOrderIdsRef = useRef<Set<string> | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
+  const flashTimerRef = useRef<number | null>(null);
+  const noticeTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 1000);
     return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (flashTimerRef.current) window.clearTimeout(flashTimerRef.current);
+      if (noticeTimerRef.current) window.clearTimeout(noticeTimerRef.current);
+    };
   }, []);
 
   useEffect(() => {
@@ -48,12 +57,17 @@ export default function MonitorPage() {
     setFlashId(addedOrder.id);
     setNewOrderNotice(true);
     if (soundEnabled) playNotificationSound(audioContextRef);
-    const timer = window.setTimeout(() => setFlashId(null), 10000);
-    const noticeTimer = window.setTimeout(() => setNewOrderNotice(false), 5000);
-    return () => {
-      window.clearTimeout(timer);
-      window.clearTimeout(noticeTimer);
-    };
+
+    if (flashTimerRef.current) window.clearTimeout(flashTimerRef.current);
+    if (noticeTimerRef.current) window.clearTimeout(noticeTimerRef.current);
+    flashTimerRef.current = window.setTimeout(() => {
+      setFlashId(null);
+      flashTimerRef.current = null;
+    }, 10000);
+    noticeTimerRef.current = window.setTimeout(() => {
+      setNewOrderNotice(false);
+      noticeTimerRef.current = null;
+    }, 5000);
   }, [orders, soundEnabled]);
 
   const activeOrders = useMemo(
