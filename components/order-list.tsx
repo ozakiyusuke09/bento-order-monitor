@@ -127,6 +127,7 @@ function OrderListRow({
             </div>
             <div className="mt-1 truncate text-base font-black text-slate-950">{order.customer_name}</div>
             <ProductChips order={order} mobile />
+            {order.note ? <OrderNoteLine note={order.note} mobile /> : null}
           </div>
           <div className="flex items-center justify-end gap-2">
             <span className="rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-center text-xs font-black text-slate-700 shadow-sm">
@@ -178,6 +179,7 @@ function OrderListRow({
 
         <div className="min-w-0">
           <ProductChips order={order} />
+          {order.note ? <OrderNoteLine note={order.note} /> : null}
         </div>
 
         <div>
@@ -245,6 +247,21 @@ function ProductChips({ order, mobile = false }: { order: OrderWithRelations; mo
           <span className="ml-1 shrink-0">x{item.quantity}</span>
         </span>
       ))}
+    </div>
+  );
+}
+
+function OrderNoteLine({ note, mobile = false }: { note: string; mobile?: boolean }) {
+  return (
+    <div
+      className={
+        mobile
+          ? "mt-1 truncate rounded border border-amber-200 bg-amber-50 px-2 py-1 text-[11px] font-bold text-amber-800"
+          : "mt-1 truncate text-xs font-bold text-amber-700"
+      }
+      title={note}
+    >
+      備考：{note}
     </div>
   );
 }

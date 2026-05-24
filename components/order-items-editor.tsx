@@ -1,7 +1,7 @@
 "use client";
 
 import { Minus, Plus, Trash2 } from "lucide-react";
-import { productChoices, riceOptionLabels } from "@/lib/constants";
+import { productChoices } from "@/lib/constants";
 import type { RiceOption } from "@/lib/types";
 
 export type OrderItemFormValue = {
@@ -94,7 +94,7 @@ export function OrderItemsEditor({
                 ) : null}
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_128px_132px]">
+              <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_128px]">
                 <label>
                   <span className="mb-1.5 block text-xs font-black text-slate-500">商品名</span>
                   <input
@@ -124,32 +124,7 @@ export function OrderItemsEditor({
                     </button>
                   </div>
                 </div>
-
-                <label>
-                  <span className="mb-1.5 block text-xs font-black text-slate-500">ご飯量</span>
-                  <select
-                    value={item.rice_option}
-                    onChange={(event) => updateItem(index, { rice_option: event.target.value as RiceOption })}
-                    className="h-10 w-full rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-900 outline-none focus:border-slate-400"
-                  >
-                    {Object.entries(riceOptionLabels).map(([value, label]) => (
-                      <option key={value} value={value}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
               </div>
-
-              <label className="mt-3 block">
-                <span className="mb-1.5 block text-xs font-black text-slate-500">商品メモ</span>
-                <input
-                  value={item.note}
-                  onChange={(event) => updateItem(index, { note: event.target.value })}
-                  placeholder="ご飯少なめ、ソース別添えなど"
-                  className="h-10 w-full rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-900 outline-none focus:border-slate-400"
-                />
-              </label>
             </div>
           ))}
         </div>

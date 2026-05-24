@@ -181,6 +181,7 @@ export default function EditOrderPage({ params }: { params: { id: string } }) {
                   <textarea
                     value={note}
                     onChange={(event) => setNote(event.target.value)}
+                    placeholder="例：唐揚げソース別、幕の内ご飯少なめ、領収書あり"
                     rows={3}
                     className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2"
                   />

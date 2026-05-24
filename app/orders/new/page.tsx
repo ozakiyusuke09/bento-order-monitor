@@ -150,6 +150,7 @@ export default function NewOrderPage() {
                   <textarea
                     value={note}
                     onChange={(event) => setNote(event.target.value)}
+                    placeholder="例：唐揚げソース別、幕の内ご飯少なめ、領収書あり"
                     rows={3}
                     className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900 outline-none focus:border-slate-400"
                   />
