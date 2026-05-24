@@ -1,6 +1,7 @@
 "use client";
 
 import { Minus, Plus, Trash2 } from "lucide-react";
+import { useProducts } from "@/hooks/use-products";
 import { productChoices } from "@/lib/constants";
 import type { RiceOption } from "@/lib/types";
 
@@ -31,13 +32,15 @@ export function OrderItemsEditor({
   submitLabel: string;
   savingLabel: string;
 }) {
+  const { products, activeProducts } = useProducts();
+  const productNames = products.length ? activeProducts.map((product) => product.name) : productChoices;
   const totalQuantity = items.reduce((sum, item) => {
     const quantity = Number(item.quantity);
     return Number.isFinite(quantity) && quantity > 0 ? sum + quantity : sum;
   }, 0);
 
   function addItem(productName = "") {
-    onItemsChange([...items, { ...blankOrderItem, product_name: productName || blankOrderItem.product_name }]);
+    onItemsChange([...items, { ...blankOrderItem, product_name: productName || productNames[0] || blankOrderItem.product_name }]);
   }
 
   function updateItem(index: number, patch: Partial<OrderItemFormValue>) {
@@ -64,7 +67,7 @@ export function OrderItemsEditor({
         </div>
 
         <div className="flex flex-wrap gap-1.5 border-b border-slate-100 px-4 py-3">
-          {productChoices.slice(0, 6).map((name) => (
+          {productNames.slice(0, 6).map((name) => (
             <button
               key={name}
               type="button"
@@ -95,15 +98,11 @@ export function OrderItemsEditor({
               </div>
 
               <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_128px]">
-                <label>
-                  <span className="mb-1.5 block text-xs font-black text-slate-500">商品名</span>
-                  <input
-                    list="products"
-                    value={item.product_name}
-                    onChange={(event) => updateItem(index, { product_name: event.target.value })}
-                    className="h-10 w-full rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-900 outline-none focus:border-slate-400"
-                  />
-                </label>
+                <ProductNameField
+                  value={item.product_name}
+                  productNames={productNames}
+                  onChange={(productName) => updateItem(index, { product_name: productName })}
+                />
 
                 <div>
                   <span className="mb-1.5 block text-xs font-black text-slate-500">数量</span>
@@ -154,12 +153,51 @@ export function OrderItemsEditor({
         </div>
         <div className="mt-2 text-center text-xs font-black text-slate-500">商品合計 {totalQuantity}個</div>
       </div>
-
-      <datalist id="products">
-        {productChoices.map((name) => (
-          <option key={name} value={name} />
-        ))}
-      </datalist>
     </>
+  );
+}
+
+function ProductNameField({
+  value,
+  productNames,
+  onChange
+}: {
+  value: string;
+  productNames: string[];
+  onChange: (value: string) => void;
+}) {
+  const isKnownProduct = productNames.includes(value);
+  const selectValue = isKnownProduct ? value : "__custom__";
+
+  return (
+    <label>
+      <span className="mb-1.5 block text-xs font-black text-slate-500">商品名</span>
+      <select
+        value={selectValue}
+        onChange={(event) => {
+          if (event.target.value === "__custom__") {
+            onChange(isKnownProduct ? "" : value);
+            return;
+          }
+          onChange(event.target.value);
+        }}
+        className="h-10 w-full rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-900 outline-none focus:border-slate-400"
+      >
+        {productNames.map((name) => (
+          <option key={name} value={name}>
+            {name}
+          </option>
+        ))}
+        <option value="__custom__">その他（自由入力）</option>
+      </select>
+      {selectValue === "__custom__" ? (
+        <input
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder="臨時メニュー名"
+          className="mt-2 h-10 w-full rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-900 outline-none focus:border-slate-400"
+        />
+      ) : null}
+    </label>
   );
 }

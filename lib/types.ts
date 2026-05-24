@@ -4,6 +4,15 @@ export type RiceOption = "normal" | "large" | "small" | "none";
 export type PaymentMethod = "cash" | "invoice" | "cashless" | "other";
 export type OrderSource = "manual" | "web" | "line" | "email" | "phone";
 
+export type Product = {
+  id: string;
+  name: string;
+  price: number | null;
+  is_active: boolean;
+  display_order: number;
+  created_at: string;
+};
+
 export type Order = {
   id: string;
   order_no: string | null;

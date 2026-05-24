@@ -15,6 +15,21 @@ values
   ('33333333-3333-3333-3333-333333333333', 'のり弁', 10, 'large'),
   ('44444444-4444-4444-4444-444444444444', '幕の内弁当', 18, 'normal');
 
+insert into products (name, price, is_active, display_order)
+select seed.name, null, true, seed.display_order
+from (
+  values
+    ('唐揚げ弁当', 1),
+    ('日替わり弁当', 2),
+    ('幕の内弁当', 3),
+    ('のり弁', 4),
+    ('焼き魚弁当', 5),
+    ('お茶', 6)
+) as seed(name, display_order)
+where not exists (
+  select 1 from products where products.name = seed.name
+);
+
 insert into status_logs (order_id, old_status, new_status, note)
 values
   ('11111111-1111-1111-1111-111111111111', null, 'new', 'ダミーデータ登録'),

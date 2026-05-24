@@ -69,6 +69,9 @@ create table if not exists products (
   created_at timestamptz not null default now()
 );
 
+create index if not exists products_display_order_idx
+on products (display_order, name);
+
 create table if not exists customers (
   id uuid primary key default gen_random_uuid(),
   name text not null,
@@ -96,13 +99,14 @@ alter table orders enable row level security;
 alter table order_items enable row level security;
 alter table status_logs enable row level security;
 alter table order_attachments enable row level security;
+alter table products enable row level security;
 
 grant usage on schema public to authenticated;
 grant select, insert, update on orders to authenticated;
 grant select, insert, update on order_items to authenticated;
 grant select, insert on status_logs to authenticated;
 grant select, insert on order_attachments to authenticated;
-grant select on products to authenticated;
+grant select, insert, update on products to authenticated;
 grant select on customers to authenticated;
 
 create policy "authenticated can read orders"
@@ -160,6 +164,22 @@ using (true);
 create policy "authenticated can insert attachments"
 on order_attachments for insert
 to authenticated
+with check (true);
+
+create policy "authenticated can read products"
+on products for select
+to authenticated
+using (true);
+
+create policy "authenticated can insert products"
+on products for insert
+to authenticated
+with check (true);
+
+create policy "authenticated can update products"
+on products for update
+to authenticated
+using (true)
 with check (true);
 
 insert into storage.buckets (id, name, public)

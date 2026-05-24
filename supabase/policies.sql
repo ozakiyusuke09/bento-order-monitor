@@ -9,6 +9,9 @@ drop policy if exists "authenticated can read status logs" on public.status_logs
 drop policy if exists "authenticated can insert status logs" on public.status_logs;
 drop policy if exists "authenticated can read attachments" on public.order_attachments;
 drop policy if exists "authenticated can insert attachments" on public.order_attachments;
+drop policy if exists "authenticated can read products" on public.products;
+drop policy if exists "authenticated can insert products" on public.products;
+drop policy if exists "authenticated can update products" on public.products;
 
 create policy "authenticated can read orders"
 on public.orders for select
@@ -67,11 +70,28 @@ on public.order_attachments for insert
 to authenticated
 with check (true);
 
+create policy "authenticated can read products"
+on public.products for select
+to authenticated
+using (true);
+
+create policy "authenticated can insert products"
+on public.products for insert
+to authenticated
+with check (true);
+
+create policy "authenticated can update products"
+on public.products for update
+to authenticated
+using (true)
+with check (true);
+
 grant usage on schema public to authenticated;
 grant select, insert, update, delete on table public.orders to authenticated;
 grant select, insert, update, delete on table public.order_items to authenticated;
 grant select, insert, update, delete on table public.status_logs to authenticated;
 grant select, insert, update, delete on table public.order_attachments to authenticated;
+grant select, insert, update, delete on table public.products to authenticated;
 
 select
   has_table_privilege('authenticated', 'public.orders', 'insert') as orders_insert_ok,

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { AuthGuard } from "@/components/auth-guard";
 import { ProductTotals } from "@/components/product-totals";
+import { ProductManagement } from "@/components/product-management";
 import { SummaryStrip } from "@/components/summary-strip";
 import { StatusBadge } from "@/components/status-badge";
 import { displayTime } from "@/lib/date";
@@ -48,6 +49,9 @@ export default function AdminPage() {
               </div>
             </section>
             <ProductTotals stats={stats} />
+          </div>
+          <div className="mt-5">
+            <ProductManagement />
           </div>
         </main>
       </AppShell>
