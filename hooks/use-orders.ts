@@ -1,11 +1,19 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { getFutureOrders, getOrdersByDate, getPastOrders, subscribeToOrderChanges } from "@/lib/order-store";
-import { todayString } from "@/lib/date";
+import {
+  getIncompleteOrders,
+  getMonitorOrders,
+  getOrdersByDate,
+  getPastOrders,
+  getReservationOrders,
+  getTomorrowOrders,
+  subscribeToOrderChanges
+} from "@/lib/order-store";
+import { addDaysString, todayString, tomorrowString } from "@/lib/date";
 import type { OrderWithRelations } from "@/lib/types";
 
-export type OrdersMode = "date" | "future" | "past";
+export type OrdersMode = "date" | "incomplete" | "tomorrow" | "reservations" | "future" | "past" | "monitor";
 
 export function useOrders(date = todayString(), mode: OrdersMode = "date") {
   const [orders, setOrders] = useState<OrderWithRelations[]>([]);
@@ -18,12 +26,19 @@ export function useOrders(date = todayString(), mode: OrdersMode = "date") {
     setRefreshing(true);
     try {
       setError(null);
+      const today = todayString();
       const next =
-        mode === "future"
-          ? await getFutureOrders(todayString())
-          : mode === "past"
-            ? await getPastOrders(todayString())
-            : await getOrdersByDate(date);
+        mode === "incomplete"
+          ? await getIncompleteOrders()
+          : mode === "tomorrow"
+            ? await getTomorrowOrders(tomorrowString())
+            : mode === "reservations" || mode === "future"
+              ? await getReservationOrders(addDaysString(today, 1))
+              : mode === "past"
+                ? await getPastOrders(today)
+                : mode === "monitor"
+                  ? await getMonitorOrders(today)
+                  : await getOrdersByDate(date);
       setOrders(next);
       setLastUpdatedAt(new Date());
     } catch (caught) {

@@ -26,6 +26,10 @@ function orderByPickup(a: OrderWithRelations, b: OrderWithRelations) {
   return a.id.localeCompare(b.id);
 }
 
+function isIncompleteOrder(order: OrderWithRelations) {
+  return !order.deleted_at && order.status !== "completed" && order.status !== "cancelled";
+}
+
 function normalizeOrder(row: any): OrderWithRelations {
   return {
     ...row,
@@ -161,6 +165,74 @@ export async function getFutureOrders(fromDate = todayString()) {
 
   return readMockOrders()
     .filter((order) => order.pickup_date > fromDate && !order.deleted_at)
+    .sort(orderByPickup);
+}
+
+export async function getIncompleteOrders() {
+  if (hasSupabaseEnv && supabase) {
+    const { data, error } = await supabase
+      .from("orders")
+      .select("*, order_items(*), order_attachments(*), status_logs(*)")
+      .is("deleted_at", null)
+      .not("status", "in", "(completed,cancelled)")
+      .order("pickup_date", { ascending: true })
+      .order("pickup_time", { ascending: true })
+      .order("created_at", { ascending: true })
+      .order("id", { ascending: true });
+
+    if (error) throw error;
+    return (data ?? []).map(normalizeOrder).sort(orderByPickup);
+  }
+
+  return readMockOrders().filter(isIncompleteOrder).sort(orderByPickup);
+}
+
+export async function getTomorrowOrders(tomorrow: string) {
+  return getOrdersByDate(tomorrow);
+}
+
+export async function getReservationOrders(afterDate: string) {
+  if (hasSupabaseEnv && supabase) {
+    const { data, error } = await supabase
+      .from("orders")
+      .select("*, order_items(*), order_attachments(*), status_logs(*)")
+      .gt("pickup_date", afterDate)
+      .is("deleted_at", null)
+      .order("pickup_date", { ascending: true })
+      .order("pickup_time", { ascending: true })
+      .order("created_at", { ascending: true })
+      .order("id", { ascending: true });
+
+    if (error) throw error;
+    return (data ?? []).map(normalizeOrder).sort(orderByPickup);
+  }
+
+  return readMockOrders()
+    .filter((order) => order.pickup_date > afterDate && !order.deleted_at)
+    .sort(orderByPickup);
+}
+
+export async function getMonitorOrders(date = todayString()) {
+  if (hasSupabaseEnv && supabase) {
+    const { data, error } = await supabase
+      .from("orders")
+      .select("*, order_items(*), order_attachments(*), status_logs(*)")
+      .lte("pickup_date", date)
+      .is("deleted_at", null)
+      .order("pickup_date", { ascending: true })
+      .order("pickup_time", { ascending: true })
+      .order("created_at", { ascending: true })
+      .order("id", { ascending: true });
+
+    if (error) throw error;
+    return (data ?? [])
+      .map(normalizeOrder)
+      .filter((order) => order.pickup_date === date || (order.pickup_date < date && isIncompleteOrder(order)))
+      .sort(orderByPickup);
+  }
+
+  return readMockOrders()
+    .filter((order) => !order.deleted_at && (order.pickup_date === date || (order.pickup_date < date && isIncompleteOrder(order))))
     .sort(orderByPickup);
 }
 

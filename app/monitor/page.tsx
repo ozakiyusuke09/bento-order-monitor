@@ -1,28 +1,33 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { MutableRefObject } from "react";
 import Link from "next/link";
 import {
   Bell,
   Clock,
   ShoppingBag,
+  Volume2,
 } from "lucide-react";
 import { AuthGuard } from "@/components/auth-guard";
 import { StatusBadge } from "@/components/status-badge";
 import { displayDate, displayTime, todayString } from "@/lib/date";
-import { receiveTypeLabels, statusLabels } from "@/lib/constants";
+import { receiveTypeLabels } from "@/lib/constants";
 import { summarizeOrders, summarizeRemainingOrders } from "@/lib/order-store";
 import { displayShortOrderNumber } from "@/lib/order-number";
 import { useOrders } from "@/hooks/use-orders";
 import type { OrderWithRelations } from "@/lib/types";
 
 export default function MonitorPage() {
-  const { orders } = useOrders();
+  const { orders } = useOrders(todayString(), "monitor");
   const stats = summarizeOrders(orders);
   const remainingStats = summarizeRemainingOrders(orders);
   const [now, setNow] = useState(new Date());
   const [flashId, setFlashId] = useState<string | null>(null);
+  const [soundEnabled, setSoundEnabled] = useState(false);
+  const [newOrderNotice, setNewOrderNotice] = useState(false);
   const seenOrderIdsRef = useRef<Set<string> | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 1000);
@@ -41,9 +46,15 @@ export default function MonitorPage() {
     if (!addedOrder) return;
 
     setFlashId(addedOrder.id);
+    setNewOrderNotice(true);
+    if (soundEnabled) playNotificationSound(audioContextRef);
     const timer = window.setTimeout(() => setFlashId(null), 10000);
-    return () => window.clearTimeout(timer);
-  }, [orders]);
+    const noticeTimer = window.setTimeout(() => setNewOrderNotice(false), 5000);
+    return () => {
+      window.clearTimeout(timer);
+      window.clearTimeout(noticeTimer);
+    };
+  }, [orders, soundEnabled]);
 
   const activeOrders = useMemo(
     () => orders.filter((order) => order.status !== "completed" && order.status !== "cancelled"),
@@ -62,6 +73,12 @@ export default function MonitorPage() {
     .sort((a, b) => a.pickup_time.localeCompare(b.pickup_time))
     .slice(0, 4);
   const heroMode = featuredOrder?.status === "new" ? "new" : "active";
+
+  async function enableSound() {
+    await getAudioContext(audioContextRef)?.resume();
+    setSoundEnabled(true);
+    playNotificationSound(audioContextRef);
+  }
 
   return (
     <AuthGuard>
@@ -91,6 +108,18 @@ export default function MonitorPage() {
                 >
                   注文登録
                 </Link>
+                <button
+                  type="button"
+                  onClick={enableSound}
+                  className={
+                    soundEnabled
+                      ? "inline-flex items-center gap-1 rounded-md border border-emerald-400/40 bg-emerald-500/20 px-[clamp(0.55rem,1vw,0.85rem)] py-[clamp(0.45rem,0.8vw,0.65rem)] text-[clamp(0.72rem,0.9vw,0.9rem)] font-black text-emerald-100"
+                      : "inline-flex items-center gap-1 rounded-md border border-white/15 bg-white/10 px-[clamp(0.55rem,1vw,0.85rem)] py-[clamp(0.45rem,0.8vw,0.65rem)] text-[clamp(0.72rem,0.9vw,0.9rem)] font-black text-slate-100 hover:bg-white/15"
+                  }
+                >
+                  <Volume2 className="h-4 w-4" />
+                  通知音ON
+                </button>
               </nav>
               <div className="h-[clamp(2.2rem,4vw,4rem)] w-px bg-white/15" />
               <div className="flex min-w-0 items-baseline gap-[clamp(0.45rem,1vw,1rem)] whitespace-nowrap">
@@ -101,11 +130,16 @@ export default function MonitorPage() {
               </div>
               <div className="h-[clamp(2.2rem,4vw,4rem)] w-px bg-white/15" />
               <div className="shrink-0 text-center">
-                <div className="text-[clamp(0.7rem,0.9vw,0.9rem)] font-bold text-slate-400">本日の注文</div>
+                <div className="text-[clamp(0.7rem,0.9vw,0.9rem)] font-bold text-slate-400">表示中</div>
                 <div className="text-[clamp(1.45rem,2vw,2.25rem)] font-black">{orders.length}<span className="ml-1 text-[clamp(0.85rem,1vw,1.1rem)]">件</span></div>
               </div>
             </div>
           </header>
+          {newOrderNotice ? (
+            <div className="pointer-events-none fixed left-1/2 top-24 z-50 -translate-x-1/2 rounded-xl border border-red-300 bg-red-600 px-6 py-3 text-xl font-black text-white shadow-2xl">
+              新規注文が入りました
+            </div>
+          ) : null}
 
           <div className="grid min-h-0 grid-cols-[minmax(0,1fr)_minmax(260px,29vw)] gap-2 lg:gap-3">
             <section
@@ -148,7 +182,7 @@ export default function MonitorPage() {
                 </div>
                 <div className="monitor-scroll h-full overflow-auto">
                   {orders.slice(0, 14).map((order) => (
-                    <MonitorOrderRow key={order.id} order={order} flash={flashId === order.id} />
+                    <MonitorOrderRow key={order.id} order={order} flash={flashId === order.id} today={todayString()} />
                   ))}
                 </div>
               </section>
@@ -261,21 +295,26 @@ function MonitorStatusCard({
   );
 }
 
-function MonitorOrderRow({ order, flash }: { order: OrderWithRelations; flash: boolean }) {
+function MonitorOrderRow({ order, flash, today }: { order: OrderWithRelations; flash: boolean; today: string }) {
   const quantity = order.items.reduce((sum, item) => sum + item.quantity, 0);
   const isAlert = order.status === "new" || flash;
+  const overdue = order.pickup_date < today && order.status !== "completed" && order.status !== "cancelled";
 
   return (
     <div
       className={`grid grid-cols-[86px_minmax(96px,1fr)_minmax(220px,2fr)_64px_74px_minmax(110px,1fr)] items-center gap-3 border-b border-white/10 px-3 py-2.5 xl:grid-cols-[96px_1fr_2.05fr_78px_92px_1fr] ${
-        isAlert ? "bg-red-500/10" : ""
+        overdue ? "bg-red-600/20" : isAlert ? "bg-red-500/10" : ""
       }`}
     >
       <div>
         <div className="text-[clamp(0.7rem,0.9vw,0.86rem)] font-black text-slate-400">{displayShortOrderNumber(order)}</div>
         <div className={`text-[clamp(1.18rem,1.65vw,1.55rem)] font-black leading-tight ${isAlert ? "text-red-300" : "text-slate-100"}`}>{displayTime(order.pickup_time)}</div>
+        {overdue ? <div className="mt-0.5 text-[0.68rem] font-black leading-tight text-red-200">{displayDate(order.pickup_date)} 超過</div> : null}
       </div>
-      <div className="truncate text-[clamp(1rem,1.25vw,1.18rem)] font-black text-white">{order.customer_name}</div>
+      <div className="min-w-0">
+        <div className="truncate text-[clamp(1rem,1.25vw,1.18rem)] font-black text-white">{order.customer_name}</div>
+        {overdue ? <div className="mt-1 inline-flex rounded bg-red-600 px-1.5 py-0.5 text-[0.68rem] font-black leading-none text-white">日付超過・要対応</div> : null}
+      </div>
       <MonitorItemBreakdown order={order} />
       <div className="text-[clamp(1rem,1.3vw,1.2rem)] font-black text-white">x {quantity}</div>
       <div className="text-[clamp(1rem,1.2vw,1.15rem)] font-black text-slate-100">{receiveTypeLabels[order.receive_type]}</div>
@@ -285,6 +324,33 @@ function MonitorOrderRow({ order, flash }: { order: OrderWithRelations; flash: b
       </div>
     </div>
   );
+}
+
+function getAudioContext(ref: MutableRefObject<AudioContext | null>) {
+  if (typeof window === "undefined") return null;
+  if (!ref.current) {
+    const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextClass) return null;
+    ref.current = new AudioContextClass();
+  }
+  return ref.current;
+}
+
+function playNotificationSound(ref: MutableRefObject<AudioContext | null>) {
+  const context = getAudioContext(ref);
+  if (!context) return;
+  const oscillator = context.createOscillator();
+  const gain = context.createGain();
+  oscillator.type = "sine";
+  oscillator.frequency.setValueAtTime(880, context.currentTime);
+  oscillator.frequency.setValueAtTime(660, context.currentTime + 0.12);
+  gain.gain.setValueAtTime(0.001, context.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.18, context.currentTime + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.35);
+  oscillator.connect(gain);
+  gain.connect(context.destination);
+  oscillator.start();
+  oscillator.stop(context.currentTime + 0.38);
 }
 
 function MonitorItemBreakdown({ order }: { order: OrderWithRelations }) {

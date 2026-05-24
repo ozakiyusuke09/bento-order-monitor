@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { MapPin, Phone, Trash2 } from "lucide-react";
 import { StatusBadge } from "@/components/status-badge";
-import { displayTime, isPickupSoon } from "@/lib/date";
+import { displayDate, displayTime, isPickupSoon, todayString } from "@/lib/date";
 import { receiveTypeLabels, statusLabels, statusSoftStyles } from "@/lib/constants";
 import { softDeleteOrder, updateOrderStatus } from "@/lib/order-store";
 import { displayShortOrderNumber } from "@/lib/order-number";
@@ -56,6 +56,7 @@ function OrderListRow({
   const [savingStatus, setSavingStatus] = useState(false);
   const isDeleted = Boolean(order.deleted_at);
   const soon = isPickupSoon(order.pickup_date, order.pickup_time) && order.status !== "completed" && !isDeleted;
+  const overdue = order.pickup_date < todayString() && order.status !== "completed" && order.status !== "cancelled" && !isDeleted;
   const nextStatus = isDeleted ? undefined : nextStatusByCurrent[order.status];
 
   async function deleteOrder() {
@@ -95,7 +96,7 @@ function OrderListRow({
   }
 
   return (
-    <article className={isDeleted ? "rounded-lg border border-slate-200 bg-slate-50 opacity-75 lg:rounded-none lg:border-0" : soon ? "rounded-lg border border-red-100 bg-red-50 lg:rounded-none lg:border-0" : "rounded-lg border border-slate-200 bg-white shadow-sm lg:rounded-none lg:border-0 lg:shadow-none"}>
+    <article className={isDeleted ? "rounded-lg border border-slate-200 bg-slate-50 opacity-75 lg:rounded-none lg:border-0" : overdue ? "rounded-lg border border-red-300 bg-red-50 shadow-sm lg:rounded-none lg:border-0 lg:shadow-none" : soon ? "rounded-lg border border-red-100 bg-red-50 lg:rounded-none lg:border-0" : "rounded-lg border border-slate-200 bg-white shadow-sm lg:rounded-none lg:border-0 lg:shadow-none"}>
       <div
         role="button"
         tabIndex={0}
@@ -110,6 +111,7 @@ function OrderListRow({
             <div className="flex min-w-0 flex-wrap items-center gap-2">
               <span className="text-xs font-black text-slate-500">{displayShortOrderNumber(order)}</span>
               <span className={`text-lg font-black ${soon ? "text-red-600" : "text-slate-950"}`}>{displayTime(order.pickup_time)}</span>
+              {overdue ? <OverdueBadge date={order.pickup_date} /> : null}
               <span
                 className={
                   order.receive_type === "delivery"
@@ -152,6 +154,7 @@ function OrderListRow({
       <div className="hidden grid-cols-[72px_72px_minmax(105px,0.7fr)_minmax(380px,2.25fr)_70px_96px_214px] items-center gap-3 px-4 py-2.5 lg:grid">
         <div>
           <div className={`text-lg font-black ${soon ? "text-red-600" : "text-slate-950"}`}>{displayTime(order.pickup_time)}</div>
+          {overdue ? <div className="mt-1 text-xs font-black text-red-700">{displayDate(order.pickup_date)} 日付超過</div> : null}
           {soon ? <div className="mt-1 text-xs font-black text-red-600">時間注意</div> : null}
         </div>
 
@@ -224,6 +227,14 @@ function OrderListRow({
         </div>
       </div>
     </article>
+  );
+}
+
+function OverdueBadge({ date }: { date: string }) {
+  return (
+    <span className="shrink-0 whitespace-nowrap rounded-md bg-red-600 px-2 py-0.5 text-xs font-black text-white">
+      {displayDate(date)} 日付超過・要対応
+    </span>
   );
 }
 

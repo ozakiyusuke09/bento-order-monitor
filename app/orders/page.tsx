@@ -11,7 +11,7 @@ import { SummaryStrip } from "@/components/summary-strip";
 import { receiveTypeLabels, statusLabels } from "@/lib/constants";
 import { summarizeOrders, summarizeRemainingOrders } from "@/lib/order-store";
 import { useOrders, type OrdersMode } from "@/hooks/use-orders";
-import { displayDate, todayString } from "@/lib/date";
+import { displayDate, todayString, tomorrowString } from "@/lib/date";
 import type { OrderStatus, ReceiveType } from "@/lib/types";
 
 type ActiveFilter =
@@ -24,8 +24,9 @@ const validStatuses: OrderStatus[] = ["new", "confirmed", "cooking", "completed"
 
 export default function OrdersPage() {
   const today = todayString();
+  const tomorrow = tomorrowString();
   const [selectedDate, setSelectedDate] = useState(today);
-  const [mode, setMode] = useState<OrdersMode>("date");
+  const [mode, setMode] = useState<OrdersMode>("incomplete");
   const [activeFilter, setActiveFilter] = useState<ActiveFilter>(null);
   const { orders, loading, refreshing, lastUpdatedAt, error, refresh } = useOrders(selectedDate, mode);
   const stats = summarizeOrders(orders);
@@ -40,13 +41,19 @@ export default function OrdersPage() {
       const receive = params.get("receive") as ReceiveType | null;
       const handoff = params.get("handoff");
 
-      if (view === "reservations") {
-        setMode("future");
+      if (view === "tomorrow") {
+        setMode("tomorrow");
+        setSelectedDate(tomorrow);
+      } else if (view === "reservations") {
+        setMode("reservations");
       } else if (view === "history") {
         setMode("past");
-      } else {
+      } else if (date) {
         setMode("date");
-        setSelectedDate(date || today);
+        setSelectedDate(date);
+      } else {
+        setMode("incomplete");
+        setSelectedDate(today);
       }
 
       if (status && validStatuses.includes(status)) {
@@ -63,7 +70,7 @@ export default function OrdersPage() {
     readQuery();
     window.addEventListener("popstate", readQuery);
     return () => window.removeEventListener("popstate", readQuery);
-  }, [today]);
+  }, [today, tomorrow]);
 
   const filteredOrders = useMemo(() => {
     if (!activeFilter) return orders;
@@ -75,9 +82,36 @@ export default function OrdersPage() {
     return orders.filter((order) => order.receive_type === activeFilter.value);
   }, [activeFilter, orders]);
 
-  const baseHref = mode === "future" ? "/orders?view=reservations" : mode === "past" ? "/orders?view=history" : `/orders?date=${selectedDate}`;
-  const headingLabel = mode === "future" ? "予約一覧" : mode === "past" ? "履歴" : "注文一覧";
-  const dateLabel = mode === "future" ? "明日以降" : mode === "past" ? "過去分" : displayDate(selectedDate);
+  const baseHref =
+    mode === "incomplete"
+      ? "/orders"
+      : mode === "tomorrow"
+        ? "/orders?view=tomorrow"
+        : mode === "reservations" || mode === "future"
+          ? "/orders?view=reservations"
+          : mode === "past"
+            ? "/orders?view=history"
+            : `/orders?date=${selectedDate}`;
+  const headingLabel =
+    mode === "incomplete"
+      ? "未完了"
+      : mode === "tomorrow"
+        ? "明日の注文"
+        : mode === "reservations" || mode === "future"
+          ? "予約一覧"
+          : mode === "past"
+            ? "履歴"
+            : "今日の注文";
+  const dateLabel =
+    mode === "incomplete"
+      ? "日付を跨いだ未完了も表示"
+      : mode === "tomorrow"
+        ? displayDate(tomorrow)
+        : mode === "reservations" || mode === "future"
+          ? "明後日以降"
+          : mode === "past"
+            ? "過去分"
+            : displayDate(selectedDate);
   const filterLabel =
     activeFilter?.type === "status"
       ? statusLabels[activeFilter.value]
@@ -122,7 +156,7 @@ export default function OrdersPage() {
           <div className="grid gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(460px,2fr)] lg:items-start xl:gap-5">
             <div className="space-y-3">
               <div className="hidden flex-wrap items-center gap-2 text-sm font-bold text-slate-700 lg:flex">
-                <span>{displayDate(selectedDate)}</span>
+                <span>{dateLabel}</span>
                 <span>
                   最終更新{" "}
                   {lastUpdatedAt
@@ -151,18 +185,11 @@ export default function OrdersPage() {
                   <span>更新</span>
                 </button>
               </div>
-              <div className="inline-grid grid-cols-4 gap-1 rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
-                <NavPill href={`/orders?date=${selectedDate || today}`} active={mode === "date" && !activeFilter} label="すべて" />
-                <NavPill
-                  href={`/orders?date=${selectedDate || today}&handoff=before`}
-                  active={mode === "date" && activeFilter?.type === "handoff" && activeFilter.value === "before"}
-                  label="受渡前"
-                />
-                <NavPill
-                  href={`/orders?date=${selectedDate || today}&handoff=done`}
-                  active={mode === "date" && activeFilter?.type === "handoff" && activeFilter.value === "done"}
-                  label="受渡済"
-                />
+              <div className="inline-grid grid-cols-5 gap-1 rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
+                <NavPill href="/orders" active={mode === "incomplete" && !activeFilter} label="未完了" />
+                <NavPill href={`/orders?date=${today}`} active={mode === "date" && selectedDate === today && !activeFilter} label="今日" />
+                <NavPill href="/orders?view=tomorrow" active={mode === "tomorrow" && !activeFilter} label="明日" />
+                <NavPill href="/orders?view=reservations" active={(mode === "reservations" || mode === "future") && !activeFilter} label="予約" />
                 <NavPill href="/orders?view=history" active={mode === "past"} label="履歴" />
               </div>
               <div className="lg:hidden">
