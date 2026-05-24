@@ -66,23 +66,10 @@ export function OrderItemsEditor({
           <div className="text-sm font-black text-slate-800">合計 {totalQuantity}個</div>
         </div>
 
-        <div className="flex flex-wrap gap-1.5 border-b border-slate-100 px-4 py-3">
-          {productNames.slice(0, 6).map((name) => (
-            <button
-              key={name}
-              type="button"
-              onClick={() => addItem(name)}
-              className="inline-flex h-9 items-center rounded-md border border-slate-200 bg-white px-2.5 text-xs font-black text-slate-800 shadow-[0_1px_1px_rgba(15,23,42,0.03)] hover:bg-slate-50"
-            >
-              + {name}
-            </button>
-          ))}
-        </div>
-
         <div className="divide-y divide-slate-100">
           {items.map((item, index) => (
-            <div key={index} className="bg-white p-4">
-              <div className="mb-3 flex items-center justify-between gap-3">
+            <div key={index} className="bg-white px-3 py-2.5 sm:px-4">
+              <div className="mb-2 flex items-center justify-between gap-2">
                 <div className="rounded-md bg-slate-100 px-2 py-1 text-xs font-black text-slate-600">商品 {index + 1}</div>
                 {items.length > 1 ? (
                   <button
@@ -90,14 +77,14 @@ export function OrderItemsEditor({
                     aria-label="商品を削除"
                     title="商品を削除"
                     onClick={() => removeItem(index)}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 text-slate-600 hover:bg-slate-50"
+                    className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-slate-200 text-slate-600 hover:bg-slate-50"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
                 ) : null}
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_128px]">
+              <div className="grid grid-cols-[minmax(0,1fr)_116px] gap-2 sm:grid-cols-[minmax(0,1fr)_128px] sm:gap-3">
                 <ProductNameField
                   value={item.product_name}
                   productNames={productNames}
@@ -105,8 +92,8 @@ export function OrderItemsEditor({
                 />
 
                 <div>
-                  <span className="mb-1.5 block text-xs font-black text-slate-500">数量</span>
-                  <div className="grid h-10 grid-cols-[38px_1fr_38px] overflow-hidden rounded-md border border-slate-200">
+                  <span className="sr-only">数量</span>
+                  <div className="grid h-10 grid-cols-[34px_1fr_34px] overflow-hidden rounded-md border border-slate-200 sm:grid-cols-[38px_1fr_38px]">
                     <button type="button" onClick={() => stepQuantity(index, -1)} className="grid place-items-center border-r border-slate-200 bg-slate-50">
                       <Minus className="h-4 w-4" />
                     </button>
@@ -171,7 +158,7 @@ function ProductNameField({
 
   return (
     <label>
-      <span className="mb-1.5 block text-xs font-black text-slate-500">商品名</span>
+      <span className="sr-only">商品名</span>
       <select
         value={selectValue}
         onChange={(event) => {
