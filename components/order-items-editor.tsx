@@ -68,23 +68,11 @@ export function OrderItemsEditor({
 
         <div className="divide-y divide-slate-100">
           {items.map((item, index) => (
-            <div key={index} className="bg-white px-3 py-2.5 sm:px-4">
-              <div className="mb-2 flex items-center justify-between gap-2">
-                <div className="rounded-md bg-slate-100 px-2 py-1 text-xs font-black text-slate-600">商品 {index + 1}</div>
-                {items.length > 1 ? (
-                  <button
-                    type="button"
-                    aria-label="商品を削除"
-                    title="商品を削除"
-                    onClick={() => removeItem(index)}
-                    className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-slate-200 text-slate-600 hover:bg-slate-50"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                ) : null}
-              </div>
-
-              <div className="grid grid-cols-[minmax(0,1fr)_116px] gap-2 sm:grid-cols-[minmax(0,1fr)_128px] sm:gap-3">
+            <div key={index} className="bg-white px-2.5 py-2 sm:px-4">
+              <div className="grid grid-cols-[64px_minmax(0,1fr)_106px_30px] items-center gap-1.5 sm:grid-cols-[76px_minmax(0,1fr)_128px_36px] sm:gap-2">
+                <div className="flex h-10 items-center justify-center rounded-md bg-slate-100 px-2 text-xs font-black text-slate-600">
+                  商品 {index + 1}
+                </div>
                 <ProductNameField
                   value={item.product_name}
                   productNames={productNames}
@@ -93,7 +81,7 @@ export function OrderItemsEditor({
 
                 <div>
                   <span className="sr-only">数量</span>
-                  <div className="grid h-10 grid-cols-[34px_1fr_34px] overflow-hidden rounded-md border border-slate-200 sm:grid-cols-[38px_1fr_38px]">
+                  <div className="grid h-10 grid-cols-[31px_1fr_31px] overflow-hidden rounded-md border border-slate-200 sm:grid-cols-[38px_1fr_38px]">
                     <button type="button" onClick={() => stepQuantity(index, -1)} className="grid place-items-center border-r border-slate-200 bg-slate-50">
                       <Minus className="h-4 w-4" />
                     </button>
@@ -110,6 +98,19 @@ export function OrderItemsEditor({
                     </button>
                   </div>
                 </div>
+                {items.length > 1 ? (
+                  <button
+                    type="button"
+                    aria-label="商品を削除"
+                    title="商品を削除"
+                    onClick={() => removeItem(index)}
+                    className="inline-flex h-10 w-full min-w-0 items-center justify-center rounded-md text-slate-700 hover:bg-slate-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                ) : (
+                  <div className="h-10" />
+                )}
               </div>
             </div>
           ))}
@@ -157,7 +158,7 @@ function ProductNameField({
   const selectValue = isKnownProduct ? value : "__custom__";
 
   return (
-    <label>
+    <div>
       <span className="sr-only">商品名</span>
       <select
         value={selectValue}
@@ -182,9 +183,9 @@ function ProductNameField({
           value={value}
           onChange={(event) => onChange(event.target.value)}
           placeholder="臨時メニュー名"
-          className="mt-2 h-10 w-full rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-900 outline-none focus:border-slate-400"
+          className="mt-1.5 h-10 w-full rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-900 outline-none focus:border-slate-400"
         />
       ) : null}
-    </label>
+    </div>
   );
 }
