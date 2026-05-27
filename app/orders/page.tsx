@@ -185,7 +185,7 @@ export default function OrdersPage() {
                   <span>更新</span>
                 </button>
               </div>
-              <div className="inline-grid grid-cols-5 gap-1 rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
+              <div className="grid w-full grid-cols-5 gap-1 rounded-lg border border-slate-200 bg-white p-1 shadow-sm sm:inline-grid sm:w-auto">
                 <NavPill href="/orders" active={mode === "incomplete" && !activeFilter} label="未完了" />
                 <NavPill href={`/orders?date=${today}`} active={mode === "date" && selectedDate === today && !activeFilter} label="今日" />
                 <NavPill href="/orders?view=tomorrow" active={mode === "tomorrow" && !activeFilter} label="明日" />
@@ -244,8 +244,8 @@ function NavPill({ href, active, label }: { href: string; active: boolean; label
       href={href}
       className={
         active
-          ? "flex h-10 items-center justify-center rounded-md bg-slate-950 px-5 text-sm font-black text-white"
-          : "flex h-10 items-center justify-center rounded-md px-5 text-sm font-black text-slate-800 hover:bg-slate-50"
+          ? "flex h-10 min-w-0 items-center justify-center whitespace-nowrap rounded-md bg-slate-950 px-2 text-xs font-black text-white sm:px-5 sm:text-sm"
+          : "flex h-10 min-w-0 items-center justify-center whitespace-nowrap rounded-md px-2 text-xs font-black text-slate-800 hover:bg-slate-50 sm:px-5 sm:text-sm"
       }
     >
       {label}

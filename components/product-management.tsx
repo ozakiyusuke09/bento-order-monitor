@@ -98,9 +98,10 @@ export function ProductManagement() {
       {error ? <div className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-sm font-bold text-amber-800">{error}</div> : null}
 
       <div className="mt-4 overflow-hidden rounded-lg border border-slate-200">
-        <div className="grid grid-cols-[1fr_92px_90px_86px] gap-2 bg-slate-50 px-3 py-2 text-xs font-black text-slate-500">
+        <div className="grid grid-cols-[minmax(120px,1fr)_58px_68px_38px] gap-1.5 bg-slate-50 px-2 py-2 text-xs font-black text-slate-500 sm:grid-cols-[minmax(0,1fr)_92px_90px_86px] sm:gap-2 sm:px-3">
           <div>商品名</div>
-          <div>表示順</div>
+          <div className="sm:hidden">順</div>
+          <div className="hidden sm:block">表示順</div>
           <div>状態</div>
           <div />
         </div>
@@ -145,7 +146,7 @@ function ProductRow({
   }
 
   return (
-    <div className="grid grid-cols-[1fr_92px_90px_86px] gap-2 px-3 py-2">
+    <div className="grid grid-cols-[minmax(120px,1fr)_58px_68px_38px] gap-1.5 px-2 py-2 sm:grid-cols-[minmax(0,1fr)_92px_90px_86px] sm:gap-2 sm:px-3">
       <input
         value={name}
         onChange={(event) => setName(event.target.value)}
@@ -157,7 +158,7 @@ function ProductRow({
         inputMode="numeric"
         value={displayOrder}
         onChange={(event) => setDisplayOrder(event.target.value)}
-        className="h-9 rounded-md border border-slate-200 px-2 text-sm font-semibold outline-none focus:border-slate-400"
+        className="h-9 min-w-0 rounded-md border border-slate-200 px-2 text-center text-sm font-semibold outline-none focus:border-slate-400"
       />
       <button
         type="button"
@@ -176,7 +177,7 @@ function ProductRow({
         disabled={saving || !name.trim()}
         aria-label="保存"
         title="保存"
-        className="inline-flex h-9 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+        className="inline-flex h-9 min-w-0 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-60"
       >
         <Save className="h-4 w-4" />
       </button>
