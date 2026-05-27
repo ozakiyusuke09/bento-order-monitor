@@ -6,8 +6,18 @@ const MOCK_AUTH_KEY = "bento-order-monitor.mock-auth";
 
 export async function isLoggedIn() {
   if (hasSupabaseEnv && supabase) {
-    const { data } = await supabase.auth.getSession();
-    return Boolean(data.session);
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        await supabase.auth.signOut();
+        return false;
+      }
+      return Boolean(data.session);
+    } catch (caught) {
+      console.warn("Failed to read Supabase session", caught);
+      await supabase.auth.signOut();
+      return false;
+    }
   }
   return typeof window !== "undefined" && window.localStorage.getItem(MOCK_AUTH_KEY) === "true";
 }

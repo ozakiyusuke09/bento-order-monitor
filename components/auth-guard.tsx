@@ -19,13 +19,18 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    isLoggedIn().then((loggedIn) => {
-      if (!loggedIn) {
+    isLoggedIn()
+      .then((loggedIn) => {
+        if (!loggedIn) {
+          window.location.href = `/login?next=${encodeURIComponent(pathname)}`;
+          return;
+        }
+        setReady(true);
+      })
+      .catch((caught) => {
+        console.warn("Failed to verify login", caught);
         window.location.href = `/login?next=${encodeURIComponent(pathname)}`;
-        return;
-      }
-      setReady(true);
-    });
+      });
   }, [pathname]);
 
   if (!ready) {
