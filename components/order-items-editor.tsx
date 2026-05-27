@@ -61,16 +61,16 @@ export function OrderItemsEditor({
   return (
     <>
       <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
-        <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-slate-50/80 px-4 py-2.5">
+        <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-slate-50/80 px-3 py-2 sm:px-4 sm:py-2.5">
           <h2 className="text-sm font-black text-slate-600">商品</h2>
           <div className="text-sm font-black text-slate-800">合計 {totalQuantity}個</div>
         </div>
 
         <div className="divide-y divide-slate-100">
           {items.map((item, index) => (
-            <div key={index} className="bg-white px-2.5 py-2 sm:px-4">
-              <div className="grid grid-cols-[64px_minmax(0,1fr)_106px_30px] items-center gap-1.5 sm:grid-cols-[76px_minmax(0,1fr)_128px_36px] sm:gap-2">
-                <div className="flex h-10 items-center justify-center rounded-md bg-slate-100 px-2 text-xs font-black text-slate-600">
+            <div key={index} className="bg-white px-2 py-1.5 sm:px-4 sm:py-2">
+              <div className="grid grid-cols-[58px_minmax(0,1fr)_102px_28px] items-center gap-1.5 sm:grid-cols-[76px_minmax(0,1fr)_128px_36px] sm:gap-2">
+                <div className="flex h-9 items-center justify-center rounded-md bg-slate-100 px-1.5 text-[11px] font-black text-slate-600 sm:h-10 sm:px-2 sm:text-xs">
                   商品 {index + 1}
                 </div>
                 <ProductNameField
@@ -81,7 +81,7 @@ export function OrderItemsEditor({
 
                 <div>
                   <span className="sr-only">数量</span>
-                  <div className="grid h-10 grid-cols-[31px_1fr_31px] overflow-hidden rounded-md border border-slate-200 sm:grid-cols-[38px_1fr_38px]">
+                  <div className="grid h-9 grid-cols-[29px_1fr_29px] overflow-hidden rounded-md border border-slate-200 sm:h-10 sm:grid-cols-[38px_1fr_38px]">
                     <button type="button" onClick={() => stepQuantity(index, -1)} className="grid place-items-center border-r border-slate-200 bg-slate-50">
                       <Minus className="h-4 w-4" />
                     </button>
@@ -91,7 +91,7 @@ export function OrderItemsEditor({
                       inputMode="numeric"
                       value={item.quantity}
                       onChange={(event) => updateItem(index, { quantity: event.target.value })}
-                      className="w-full text-center text-base font-black outline-none"
+                      className="w-full text-center text-sm font-black outline-none sm:text-base"
                     />
                     <button type="button" onClick={() => stepQuantity(index, 1)} className="grid place-items-center border-l border-slate-200 bg-slate-50">
                       <Plus className="h-4 w-4" />
@@ -104,12 +104,12 @@ export function OrderItemsEditor({
                     aria-label="商品を削除"
                     title="商品を削除"
                     onClick={() => removeItem(index)}
-                    className="inline-flex h-10 w-full min-w-0 items-center justify-center rounded-md text-slate-700 hover:bg-slate-50"
+                    className="inline-flex h-9 w-full min-w-0 items-center justify-center rounded-md text-slate-700 hover:bg-slate-50 sm:h-10"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
                 ) : (
-                  <div className="h-10" />
+                  <div className="h-9 sm:h-10" />
                 )}
               </div>
             </div>
@@ -169,7 +169,7 @@ function ProductNameField({
           }
           onChange(event.target.value);
         }}
-        className="h-10 w-full rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-900 outline-none focus:border-slate-400"
+        className="h-9 w-full rounded-md border border-slate-200 px-2 text-sm font-semibold text-slate-900 outline-none focus:border-slate-400 sm:h-10 sm:px-3"
       >
         {productNames.map((name) => (
           <option key={name} value={name}>
@@ -183,7 +183,7 @@ function ProductNameField({
           value={value}
           onChange={(event) => onChange(event.target.value)}
           placeholder="臨時メニュー名"
-          className="mt-1.5 h-10 w-full rounded-md border border-slate-200 px-3 text-sm font-semibold text-slate-900 outline-none focus:border-slate-400"
+          className="mt-1.5 h-9 w-full rounded-md border border-slate-200 px-2 text-sm font-semibold text-slate-900 outline-none focus:border-slate-400 sm:h-10 sm:px-3"
         />
       ) : null}
     </div>

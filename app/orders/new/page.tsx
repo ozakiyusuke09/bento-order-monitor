@@ -86,24 +86,28 @@ export default function NewOrderPage() {
             </div>
           </div>
 
-          <form onSubmit={submit} noValidate className="grid gap-4 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:items-start">
+          <form onSubmit={submit} noValidate className="grid gap-3 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:items-start lg:gap-4">
             <div className="space-y-3">
               <FormCard icon={<UserRound className="h-5 w-5" />} title="お客様情報">
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
                   <Input label="注文者名" value={customerName} onChange={setCustomerName} required />
                   <Input icon={<Phone className="h-4 w-4" />} label="電話番号" value={phone} onChange={setPhone} />
                 </div>
               </FormCard>
 
               <FormCard icon={<CalendarDays className="h-5 w-5" />} title="受取日時">
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
                   <Input label="受取日" type="date" value={pickupDate} onChange={setPickupDate} required />
                   <Input icon={<Clock className="h-4 w-4" />} label="受取時間" type="time" value={pickupTime} onChange={setPickupTime} required />
                 </div>
               </FormCard>
 
+              <div className="lg:hidden">
+                <OrderItemsEditor items={items} onItemsChange={setItems} saving={saving} submitLabel="注文を登録" savingLabel="登録中..." />
+              </div>
+
               <FormCard icon={<MapPin className="h-5 w-5" />} title="受取方法">
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
                   <div>
                     <span className="mb-1.5 block text-xs font-black text-slate-500">受取方法</span>
                     <div className="grid grid-cols-2 gap-1 rounded-md border border-slate-200 bg-slate-50 p-1">
@@ -112,8 +116,8 @@ export default function NewOrderPage() {
                         onClick={() => setReceiveType("pickup")}
                         className={
                           receiveType === "pickup"
-                            ? "h-10 rounded bg-slate-950 text-sm font-black text-white"
-                            : "h-10 rounded text-sm font-black text-slate-700 hover:bg-white"
+                            ? "h-9 rounded bg-slate-950 text-sm font-black text-white sm:h-10"
+                            : "h-9 rounded text-sm font-black text-slate-700 hover:bg-white sm:h-10"
                         }
                       >
                         店頭
@@ -123,8 +127,8 @@ export default function NewOrderPage() {
                         onClick={() => setReceiveType("delivery")}
                         className={
                           receiveType === "delivery"
-                            ? "h-10 rounded bg-slate-950 text-sm font-black text-white"
-                            : "h-10 rounded text-sm font-black text-slate-700 hover:bg-white"
+                            ? "h-9 rounded bg-slate-950 text-sm font-black text-white sm:h-10"
+                            : "h-9 rounded text-sm font-black text-slate-700 hover:bg-white sm:h-10"
                         }
                       >
                         配達
@@ -144,7 +148,7 @@ export default function NewOrderPage() {
                     ]}
                   />
                   {receiveType === "delivery" ? (
-                    <div className="sm:col-span-2">
+                    <div className="col-span-2">
                       <Input icon={<MapPin className="h-4 w-4" />} label="配達先（任意）" value={deliveryAddress} onChange={setDeliveryAddress} />
                     </div>
                   ) : null}
@@ -156,14 +160,16 @@ export default function NewOrderPage() {
                   value={note}
                   onChange={(event) => setNote(event.target.value)}
                   placeholder="例：唐揚げソース別、幕の内ご飯少なめ、領収書あり"
-                  rows={3}
+                  rows={2}
                   className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900 outline-none focus:border-slate-400"
                 />
               </FormCard>
             </div>
 
             <div className="space-y-4">
-              <OrderItemsEditor items={items} onItemsChange={setItems} saving={saving} submitLabel="注文を登録" savingLabel="登録中..." />
+              <div className="hidden lg:block">
+                <OrderItemsEditor items={items} onItemsChange={setItems} saving={saving} submitLabel="注文を登録" savingLabel="登録中..." />
+              </div>
 
               {error ? (
                 <div className="rounded-md border border-red-200 bg-red-50 p-4 font-bold text-red-700" role="alert">
@@ -188,8 +194,8 @@ export default function NewOrderPage() {
 
 function FormCard({ icon, title, children }: { icon: ReactNode; title: string; children: ReactNode }) {
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)] sm:p-4">
-      <h2 className="mb-3 flex items-center gap-2 text-sm font-black text-slate-600">
+    <section className="rounded-lg border border-slate-200 bg-white p-2.5 shadow-[0_1px_2px_rgba(15,23,42,0.04)] sm:p-4">
+      <h2 className="mb-2 flex items-center gap-2 text-sm font-black text-slate-600 sm:mb-3">
         <span className="text-slate-500">{icon}</span>
         {title}
       </h2>
@@ -215,7 +221,7 @@ function Input({
 }) {
   return (
     <label className="block">
-      <span className="mb-1.5 flex items-center gap-1.5 text-xs font-black text-slate-500">
+      <span className="mb-1 flex items-center gap-1 text-[11px] font-black text-slate-500 sm:mb-1.5 sm:gap-1.5 sm:text-xs">
         {icon}
         {label}
       </span>
@@ -224,7 +230,7 @@ function Input({
         required={required}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-900 outline-none focus:border-slate-400"
+        className="h-9 w-full rounded-md border border-slate-200 bg-white px-2 text-sm font-semibold text-slate-900 outline-none focus:border-slate-400 sm:h-10 sm:px-3"
       />
     </label>
   );
@@ -245,14 +251,14 @@ function Select({
 }) {
   return (
     <label className="block">
-      <span className="mb-1.5 flex items-center gap-1.5 text-xs font-black text-slate-500">
+      <span className="mb-1 flex items-center gap-1 text-[11px] font-black text-slate-500 sm:mb-1.5 sm:gap-1.5 sm:text-xs">
         {icon}
         {label}
       </span>
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-900 outline-none focus:border-slate-400"
+        className="h-9 w-full rounded-md border border-slate-200 bg-white px-2 text-sm font-semibold text-slate-900 outline-none focus:border-slate-400 sm:h-10 sm:px-3"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
