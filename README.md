@@ -26,6 +26,7 @@ npm run dev
 ## 環境変数
 
 `.env.example` を参考に `.env.local` を作成します。
+開発用Supabaseを使う場合は `.env.development.example` も参考にしてください。
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=
