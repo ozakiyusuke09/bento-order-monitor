@@ -87,7 +87,7 @@ export default function NewOrderPage() {
           </div>
 
           <form onSubmit={submit} noValidate className="grid gap-3 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:items-start lg:gap-4">
-            <div className="space-y-3">
+            <div className="order-1 space-y-3 lg:col-start-1 lg:row-start-1">
               <FormCard icon={<UserRound className="h-5 w-5" />} title="お客様情報">
                 <div className="grid grid-cols-2 gap-2 sm:gap-3">
                   <Input label="注文者名" value={customerName} onChange={setCustomerName} required />
@@ -101,11 +101,27 @@ export default function NewOrderPage() {
                   <Input icon={<Clock className="h-4 w-4" />} label="受取時間" type="time" value={pickupTime} onChange={setPickupTime} required />
                 </div>
               </FormCard>
+            </div>
 
-              <div className="lg:hidden">
-                <OrderItemsEditor items={items} onItemsChange={setItems} saving={saving} submitLabel="注文を登録" savingLabel="登録中..." />
-              </div>
+            <div className="order-2 space-y-4 lg:col-start-2 lg:row-span-2 lg:row-start-1">
+              <OrderItemsEditor items={items} onItemsChange={setItems} saving={saving} submitLabel="注文を登録" savingLabel="登録中..." />
 
+              {error ? (
+                <div className="rounded-md border border-red-200 bg-red-50 p-4 font-bold text-red-700" role="alert">
+                  {error}
+                </div>
+              ) : null}
+
+              <button
+                type="submit"
+                disabled={saving}
+                className="hidden h-12 w-full rounded-md bg-slate-950 px-5 text-base font-black text-white shadow-sm hover:bg-slate-800 disabled:opacity-60 sm:block"
+              >
+                {saving ? "登録中..." : "注文を登録"}
+              </button>
+            </div>
+
+            <div className="order-3 space-y-3 lg:col-start-1 lg:row-start-2">
               <FormCard icon={<MapPin className="h-5 w-5" />} title="受取方法">
                 <div className="grid grid-cols-2 gap-2 sm:gap-3">
                   <div>
@@ -164,26 +180,6 @@ export default function NewOrderPage() {
                   className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900 outline-none focus:border-slate-400"
                 />
               </FormCard>
-            </div>
-
-            <div className="space-y-4">
-              <div className="hidden lg:block">
-                <OrderItemsEditor items={items} onItemsChange={setItems} saving={saving} submitLabel="注文を登録" savingLabel="登録中..." />
-              </div>
-
-              {error ? (
-                <div className="rounded-md border border-red-200 bg-red-50 p-4 font-bold text-red-700" role="alert">
-                  {error}
-                </div>
-              ) : null}
-
-              <button
-                type="submit"
-                disabled={saving}
-                className="hidden h-12 w-full rounded-md bg-slate-950 px-5 text-base font-black text-white shadow-sm hover:bg-slate-800 disabled:opacity-60 sm:block"
-              >
-                {saving ? "登録中..." : "注文を登録"}
-              </button>
             </div>
           </form>
         </main>
