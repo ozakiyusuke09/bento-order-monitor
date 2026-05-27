@@ -73,6 +73,8 @@ SUPABASE_SERVICE_ROLE_KEY=開発用SupabaseのService Role Key
 3. 必要なら `supabase/seed.sql` でテストデータを入れる
 4. Authenticationで開発用ログインユーザーを作る
 
+詳しい手順は `docs/development-supabase-checklist.md` にまとめています。
+
 ### Supabaseでコピーする値
 
 Supabaseの管理画面で、開発用プロジェクトの以下をコピーします。
