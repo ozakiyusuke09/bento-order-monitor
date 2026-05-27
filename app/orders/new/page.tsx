@@ -87,79 +87,80 @@ export default function NewOrderPage() {
           </div>
 
           <form onSubmit={submit} noValidate className="grid gap-4 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:items-start">
-            <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
-              <div className="border-b border-slate-200 bg-slate-50/80 px-4 py-2.5">
-                <h2 className="text-sm font-black text-slate-600">基本情報</h2>
-              </div>
-              <div className="grid gap-x-3 gap-y-3 p-4 sm:grid-cols-2">
-                <Input icon={<UserRound className="h-4 w-4" />} label="注文者名" value={customerName} onChange={setCustomerName} required />
-                <Input icon={<Phone className="h-4 w-4" />} label="電話番号" value={phone} onChange={setPhone} />
-                <Input icon={<CalendarDays className="h-4 w-4" />} label="受取日" type="date" value={pickupDate} onChange={setPickupDate} required />
-                <Input icon={<Clock className="h-4 w-4" />} label="受取時間" type="time" value={pickupTime} onChange={setPickupTime} required />
-                <div>
-                  <span className="mb-1.5 block text-xs font-black text-slate-500">受取方法</span>
-                  <div className="grid grid-cols-2 gap-1 rounded-md border border-slate-200 bg-slate-50 p-1">
-                    <button
-                      type="button"
-                      onClick={() => setReceiveType("pickup")}
-                      className={
-                        receiveType === "pickup"
-                          ? "h-10 rounded bg-slate-950 text-sm font-black text-white"
-                          : "h-10 rounded text-sm font-black text-slate-700 hover:bg-white"
-                      }
-                    >
-                      店頭
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setReceiveType("delivery")}
-                      className={
-                        receiveType === "delivery"
-                          ? "h-10 rounded bg-slate-950 text-sm font-black text-white"
-                          : "h-10 rounded text-sm font-black text-slate-700 hover:bg-white"
-                      }
-                    >
-                      配達
-                    </button>
+            <div className="space-y-3">
+              <FormCard icon={<UserRound className="h-5 w-5" />} title="お客様情報">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Input label="注文者名" value={customerName} onChange={setCustomerName} required />
+                  <Input icon={<Phone className="h-4 w-4" />} label="電話番号" value={phone} onChange={setPhone} />
+                </div>
+              </FormCard>
+
+              <FormCard icon={<CalendarDays className="h-5 w-5" />} title="受取日時">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Input label="受取日" type="date" value={pickupDate} onChange={setPickupDate} required />
+                  <Input icon={<Clock className="h-4 w-4" />} label="受取時間" type="time" value={pickupTime} onChange={setPickupTime} required />
+                </div>
+              </FormCard>
+
+              <FormCard icon={<MapPin className="h-5 w-5" />} title="受取方法">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <span className="mb-1.5 block text-xs font-black text-slate-500">受取方法</span>
+                    <div className="grid grid-cols-2 gap-1 rounded-md border border-slate-200 bg-slate-50 p-1">
+                      <button
+                        type="button"
+                        onClick={() => setReceiveType("pickup")}
+                        className={
+                          receiveType === "pickup"
+                            ? "h-10 rounded bg-slate-950 text-sm font-black text-white"
+                            : "h-10 rounded text-sm font-black text-slate-700 hover:bg-white"
+                        }
+                      >
+                        店頭
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setReceiveType("delivery")}
+                        className={
+                          receiveType === "delivery"
+                            ? "h-10 rounded bg-slate-950 text-sm font-black text-white"
+                            : "h-10 rounded text-sm font-black text-slate-700 hover:bg-white"
+                        }
+                      >
+                        配達
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <Select
-                  icon={<CreditCard className="h-4 w-4" />}
-                  label="支払い方法"
-                  value={paymentMethod}
-                  onChange={setPaymentMethod}
-                  options={[
-                    { value: "cash", label: "現金" },
-                    { value: "invoice", label: "請求" },
-                    { value: "cashless", label: "キャッシュレス" },
-                    { value: "other", label: "その他" }
-                  ]}
-                />
-              </div>
-              {receiveType === "delivery" ? (
-                <div className="border-t border-slate-100 px-4 pb-4 pt-4">
-                  <Input icon={<MapPin className="h-4 w-4" />} label="配達先（任意）" value={deliveryAddress} onChange={setDeliveryAddress} />
-                </div>
-              ) : null}
-              <div className="border-t border-slate-100 p-4">
-                <label className="block">
-                  <span className="mb-1.5 flex items-center gap-1.5 text-xs font-black text-slate-500">
-                    <StickyNote className="h-4 w-4" />
-                    備考
-                  </span>
-                  <textarea
-                    value={note}
-                    onChange={(event) => setNote(event.target.value)}
-                    placeholder="例：唐揚げソース別、幕の内ご飯少なめ、領収書あり"
-                    rows={3}
-                    className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900 outline-none focus:border-slate-400"
+                  <Select
+                    icon={<CreditCard className="h-4 w-4" />}
+                    label="支払い方法"
+                    value={paymentMethod}
+                    onChange={setPaymentMethod}
+                    options={[
+                      { value: "cash", label: "現金" },
+                      { value: "invoice", label: "請求" },
+                      { value: "cashless", label: "キャッシュレス" },
+                      { value: "other", label: "その他" }
+                    ]}
                   />
-                </label>
-                <div className="mt-3 rounded-md border border-dashed border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-500">
-                  添付は登録後の詳細画面から追加できます。
+                  {receiveType === "delivery" ? (
+                    <div className="sm:col-span-2">
+                      <Input icon={<MapPin className="h-4 w-4" />} label="配達先（任意）" value={deliveryAddress} onChange={setDeliveryAddress} />
+                    </div>
+                  ) : null}
                 </div>
-              </div>
-            </section>
+              </FormCard>
+
+              <FormCard icon={<StickyNote className="h-5 w-5" />} title="備考">
+                <textarea
+                  value={note}
+                  onChange={(event) => setNote(event.target.value)}
+                  placeholder="例：唐揚げソース別、幕の内ご飯少なめ、領収書あり"
+                  rows={3}
+                  className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900 outline-none focus:border-slate-400"
+                />
+              </FormCard>
+            </div>
 
             <div className="space-y-4">
               <OrderItemsEditor items={items} onItemsChange={setItems} saving={saving} submitLabel="注文を登録" savingLabel="登録中..." />
@@ -182,6 +183,18 @@ export default function NewOrderPage() {
         </main>
       </AppShell>
     </AuthGuard>
+  );
+}
+
+function FormCard({ icon, title, children }: { icon: ReactNode; title: string; children: ReactNode }) {
+  return (
+    <section className="rounded-lg border border-slate-200 bg-white p-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)] sm:p-4">
+      <h2 className="mb-3 flex items-center gap-2 text-sm font-black text-slate-600">
+        <span className="text-slate-500">{icon}</span>
+        {title}
+      </h2>
+      {children}
+    </section>
   );
 }
 
