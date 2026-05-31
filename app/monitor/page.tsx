@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { AuthGuard } from "@/components/auth-guard";
 import { StatusBadge } from "@/components/status-badge";
-import { displayDate, displayTime, todayString } from "@/lib/date";
+import { displayDate, displayTime, todayString, tomorrowString } from "@/lib/date";
 import { receiveTypeLabels } from "@/lib/constants";
 import { summarizeOrders, summarizeRemainingOrders } from "@/lib/order-store";
 import { displayShortOrderNumber } from "@/lib/order-number";
@@ -20,8 +20,13 @@ import type { OrderWithRelations } from "@/lib/types";
 
 export default function MonitorPage() {
   const { orders } = useOrders(todayString(), "monitor");
+  const { orders: tomorrowOrders } = useOrders(tomorrowString(), "tomorrow");
   const stats = summarizeOrders(orders);
-  const remainingStats = summarizeRemainingOrders(orders);
+  const today = todayString();
+  const tomorrow = tomorrowString();
+  const todayOrders = useMemo(() => orders.filter((order) => order.pickup_date === today), [orders, today]);
+  const todayProductStats = summarizeRemainingOrders(todayOrders);
+  const tomorrowProductStats = summarizeRemainingOrders(tomorrowOrders);
   const [now, setNow] = useState(new Date());
   const [flashId, setFlashId] = useState<string | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(false);
@@ -78,14 +83,6 @@ export default function MonitorPage() {
     [...orders].filter((order) => order.status === "new").sort((a, b) => b.created_at.localeCompare(a.created_at))[0] ??
     null;
   const featuredOrder = newestNewOrder ?? activeOrders[0] ?? orders[0];
-  const upcomingOrders = activeOrders
-    .filter((order) => order.pickup_date === todayString())
-    .sort((a, b) => a.pickup_time.localeCompare(b.pickup_time))
-    .slice(0, 4);
-  const deliveryOrders = activeOrders
-    .filter((order) => order.receive_type === "delivery")
-    .sort((a, b) => a.pickup_time.localeCompare(b.pickup_time))
-    .slice(0, 4);
   const heroMode = featuredOrder?.status === "new" ? "new" : "active";
 
   async function enableSound() {
@@ -167,7 +164,7 @@ export default function MonitorPage() {
             >
               {featuredOrder ? <NewOrderHero order={featuredOrder} flash={flashId === featuredOrder.id} mode={heroMode} /> : <EmptyHero />}
             </section>
-            <ProductPanel stats={remainingStats} compact />
+            <DayProductPanel title="今日の商品数" date={displayDate(today)} stats={todayProductStats} compact />
           </div>
 
           <div className="grid min-h-0 grid-cols-[minmax(0,1fr)_minmax(260px,29vw)] gap-2 lg:gap-3">
@@ -203,8 +200,8 @@ export default function MonitorPage() {
             </section>
 
             <aside className="grid min-h-0 grid-rows-[1fr_1fr] gap-2 lg:gap-3">
-              <UpcomingPanel orders={upcomingOrders} now={now} />
-              <DeliveryPanel orders={deliveryOrders} />
+              <DayProductPanel title="今日の必要数" date={displayDate(today)} stats={todayProductStats} />
+              <DayProductPanel title="明日の必要数" date={displayDate(tomorrow)} stats={tomorrowProductStats} />
             </aside>
           </div>
         </div>
@@ -387,22 +384,35 @@ function MonitorItemBreakdown({ order }: { order: OrderWithRelations }) {
   );
 }
 
-function ProductPanel({ stats, compact = false }: { stats: ReturnType<typeof summarizeRemainingOrders>; compact?: boolean }) {
+function DayProductPanel({
+  title,
+  date,
+  stats,
+  compact = false
+}: {
+  title: string;
+  date: string;
+  stats: ReturnType<typeof summarizeRemainingOrders>;
+  compact?: boolean;
+}) {
   if (compact) {
     return (
       <section className="min-h-0 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] px-2 py-1.5">
         <div className="flex h-full min-w-0 items-center gap-2">
           <div className="shrink-0">
-            <h2 className="text-[clamp(0.8rem,1vw,0.95rem)] font-black leading-tight">商品別合計</h2>
-            <div className="text-[clamp(0.68rem,0.8vw,0.75rem)] font-black leading-tight text-slate-300">残り {stats.totalItems} 個</div>
+            <h2 className="text-[clamp(0.8rem,1vw,0.95rem)] font-black leading-tight">{title}</h2>
+            <div className="text-[clamp(0.68rem,0.8vw,0.75rem)] font-black leading-tight text-slate-300">
+              {date} / 合計 {stats.totalItems} 個
+            </div>
           </div>
           <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1 overflow-hidden">
-            {stats.productTotals.slice(0, 3).map((item) => (
+            {stats.productTotals.slice(0, 4).map((item) => (
               <div key={item.product_name} className="inline-flex max-w-[46%] items-center gap-1 rounded-md border border-white/10 bg-white/[0.04] px-2 py-1">
                 <span className="truncate text-[clamp(0.72rem,0.9vw,0.85rem)] font-bold text-slate-100">{item.product_name}</span>
                 <span className="shrink-0 text-[clamp(0.9rem,1.2vw,1.1rem)] font-black leading-none text-white">{item.quantity}<span className="ml-0.5 text-[0.62rem]">個</span></span>
               </div>
             ))}
+            {stats.productTotals.length === 0 ? <div className="text-[clamp(0.72rem,0.9vw,0.85rem)] font-bold text-slate-400">未完了の商品はありません</div> : null}
           </div>
         </div>
       </section>
@@ -412,76 +422,24 @@ function ProductPanel({ stats, compact = false }: { stats: ReturnType<typeof sum
   return (
     <section className="min-h-0 rounded-xl border border-white/10 bg-white/[0.04] p-2 xl:p-3">
       <div className="mb-2 flex items-end justify-between">
-        <h2 className={compact ? "text-[clamp(1rem,1.4vw,1.25rem)] font-black" : "text-[clamp(1.2rem,1.8vw,1.5rem)] font-black"}>商品別合計</h2>
-        <div className="text-[clamp(0.78rem,1vw,1rem)] font-black text-slate-300">残り {stats.totalItems} 個</div>
+        <div>
+          <h2 className="text-[clamp(1.15rem,1.55vw,1.45rem)] font-black leading-tight">{title}</h2>
+          <div className="text-[clamp(0.72rem,0.9vw,0.85rem)] font-black text-slate-400">{date}</div>
+        </div>
+        <div className="text-right">
+          <div className="text-[clamp(1.8rem,2.8vw,2.6rem)] font-black leading-none text-white">{stats.totalItems}<span className="ml-1 text-[0.85rem]">個</span></div>
+          <div className="text-[clamp(0.68rem,0.8vw,0.76rem)] font-black text-slate-400">未完了分</div>
+        </div>
       </div>
-      <div className="space-y-1.5">
-        {stats.productTotals.slice(0, compact ? 4 : 8).map((item) => (
-          <div key={item.product_name} className="flex items-center justify-between border-t border-white/10 pt-1.5">
-            <div className="truncate text-[clamp(0.85rem,1.05vw,1rem)] font-bold text-slate-100">{item.product_name}</div>
-            <div className="shrink-0 text-[clamp(1.3rem,1.8vw,1.6rem)] font-black text-white">{item.quantity}<span className="ml-1 text-xs">個</span></div>
+      <div className="monitor-scroll h-[calc(100%-4.6rem)] space-y-1.5 overflow-auto pr-1">
+        {stats.productTotals.map((item) => (
+          <div key={item.product_name} className="flex items-center justify-between gap-2 rounded-md border border-white/10 bg-white/[0.04] px-2 py-1.5">
+            <div className="min-w-0 truncate text-[clamp(0.95rem,1.2vw,1.12rem)] font-black text-slate-100">{item.product_name}</div>
+            <div className="shrink-0 text-[clamp(1.45rem,2.1vw,1.9rem)] font-black leading-none text-white">{item.quantity}<span className="ml-1 text-[0.75rem]">個</span></div>
           </div>
         ))}
+        {stats.productTotals.length === 0 ? <div className="rounded-md border border-white/10 bg-white/[0.03] p-3 text-slate-400">未完了の商品はありません。</div> : null}
       </div>
     </section>
   );
-}
-
-function UpcomingPanel({ orders, now }: { orders: OrderWithRelations[]; now: Date }) {
-  return (
-    <section className="min-h-0 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] p-2 xl:p-3">
-      <div className="mb-2">
-        <h2 className="flex min-w-0 items-center truncate text-[clamp(0.95rem,1.2vw,1.1rem)] font-black leading-tight">
-          <span className="truncate">まもなく受け渡し</span>
-        </h2>
-      </div>
-      <div className="space-y-2">
-        {orders.map((order) => (
-          <SideOrder key={order.id} order={order} sub={timeLeftText(order, now)} />
-        ))}
-        {orders.length === 0 ? <div className="text-slate-400">対象の注文はありません。</div> : null}
-      </div>
-    </section>
-  );
-}
-
-function DeliveryPanel({ orders }: { orders: OrderWithRelations[] }) {
-  return (
-    <section className="min-h-0 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] p-2 xl:p-3">
-      <div className="mb-2">
-        <h2 className="flex min-w-0 items-center truncate text-[clamp(0.95rem,1.2vw,1.1rem)] font-black leading-tight">
-          <span className="truncate">配達予定</span>
-        </h2>
-      </div>
-      <div className="space-y-2">
-        {orders.map((order) => (
-          <SideOrder key={order.id} order={order} sub={order.delivery_address || "住所未入力"} />
-        ))}
-        {orders.length === 0 ? <div className="text-slate-400">配達予定はありません。</div> : null}
-      </div>
-    </section>
-  );
-}
-
-function SideOrder({ order, sub }: { order: OrderWithRelations; sub: string }) {
-  const itemText = order.items.map((item) => `${item.product_name} x${item.quantity}`).join(" / ");
-  return (
-    <div className="grid grid-cols-[52px_minmax(0,1fr)_auto] gap-2 border-t border-white/10 pt-2 xl:grid-cols-[62px_minmax(0,1fr)_auto]">
-      <div className="text-[clamp(0.85rem,1vw,1rem)] font-black text-red-300">{displayTime(order.pickup_time)}</div>
-      <div className="min-w-0">
-        <div className="truncate text-[clamp(0.85rem,1vw,1rem)] font-black text-white">{order.customer_name}</div>
-        <div className="truncate text-[clamp(0.72rem,0.9vw,0.88rem)] font-bold text-slate-300">{itemText}</div>
-        <div className="truncate text-[clamp(0.68rem,0.8vw,0.75rem)] font-bold text-red-300">{sub}</div>
-      </div>
-      <div className="self-center rounded-md bg-slate-700 px-2 py-1 text-[clamp(0.65rem,0.8vw,0.75rem)] font-black">{receiveTypeLabels[order.receive_type]}</div>
-    </div>
-  );
-}
-
-function timeLeftText(order: OrderWithRelations, now: Date) {
-  const target = new Date(`${order.pickup_date}T${order.pickup_time}`);
-  const minutes = Math.round((target.getTime() - now.getTime()) / 60000);
-  if (minutes < 0) return `${Math.abs(minutes)}分超過`;
-  if (minutes === 0) return "まもなく";
-  return `あと${minutes}分`;
 }
