@@ -152,7 +152,7 @@ export default function MonitorPage() {
             </div>
           ) : null}
 
-          <div className="grid min-h-0 grid-cols-[minmax(0,1fr)_minmax(260px,29vw)] gap-2 lg:gap-3">
+          <div className="grid min-h-0 grid-cols-[minmax(0,1fr)_minmax(420px,36vw)] gap-2 lg:gap-3">
             <section
               className={`min-h-0 rounded-xl border p-2 ${
                 heroMode === "new"
@@ -167,7 +167,7 @@ export default function MonitorPage() {
             <DayProductPanel title="今日の商品数" date={displayDate(today)} stats={todayProductStats} compact />
           </div>
 
-          <div className="grid min-h-0 grid-cols-[minmax(0,1fr)_minmax(260px,29vw)] gap-2 lg:gap-3">
+          <div className="grid min-h-0 grid-cols-[minmax(0,1fr)_minmax(420px,36vw)] gap-2 lg:gap-3">
             <section className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-2 lg:gap-3">
               <div className="grid grid-cols-[repeat(5,minmax(0,1fr))_auto] items-stretch gap-1.5 lg:gap-2">
                 <MonitorStatusCard label="新規" count={stats.statusCounts.new} tone="red" />
@@ -431,14 +431,14 @@ function DayProductPanel({
           <div className="text-[clamp(0.68rem,0.8vw,0.76rem)] font-black text-slate-400">未完了分</div>
         </div>
       </div>
-      <div className="monitor-scroll h-[calc(100%-4.6rem)] space-y-1.5 overflow-auto pr-1">
+      <div className="grid grid-cols-2 gap-1.5">
         {stats.productTotals.map((item) => (
-          <div key={item.product_name} className="flex items-center justify-between gap-2 rounded-md border border-white/10 bg-white/[0.04] px-2 py-1.5">
-            <div className="min-w-0 truncate text-[clamp(0.95rem,1.2vw,1.12rem)] font-black text-slate-100">{item.product_name}</div>
-            <div className="shrink-0 text-[clamp(1.45rem,2.1vw,1.9rem)] font-black leading-none text-white">{item.quantity}<span className="ml-1 text-[0.75rem]">個</span></div>
+          <div key={item.product_name} className="flex min-w-0 items-center justify-between gap-2 rounded-md border border-white/10 bg-white/[0.04] px-2 py-1.5">
+            <div className="min-w-0 truncate text-[clamp(0.82rem,1vw,1rem)] font-black text-slate-100">{item.product_name}</div>
+            <div className="shrink-0 text-[clamp(1.25rem,1.75vw,1.7rem)] font-black leading-none text-white">{item.quantity}<span className="ml-1 text-[0.7rem]">個</span></div>
           </div>
         ))}
-        {stats.productTotals.length === 0 ? <div className="rounded-md border border-white/10 bg-white/[0.03] p-3 text-slate-400">未完了の商品はありません。</div> : null}
+        {stats.productTotals.length === 0 ? <div className="col-span-2 rounded-md border border-white/10 bg-white/[0.03] p-3 text-slate-400">未完了の商品はありません。</div> : null}
       </div>
     </section>
   );
