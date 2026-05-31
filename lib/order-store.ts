@@ -99,8 +99,9 @@ function writeMockOrders(orders: OrderWithRelations[]) {
 export function subscribeToOrderChanges(onChange: () => void) {
   if (hasSupabaseEnv && supabase) {
     const client = supabase;
+    const channelName = `order-monitor-live-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const channel = client
-      .channel("order-monitor-live")
+      .channel(channelName)
       .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, onChange)
       .on("postgres_changes", { event: "*", schema: "public", table: "order_items" }, onChange)
       .on("postgres_changes", { event: "*", schema: "public", table: "status_logs" }, onChange)
