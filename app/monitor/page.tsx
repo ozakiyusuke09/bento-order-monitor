@@ -152,7 +152,7 @@ export default function MonitorPage() {
             </div>
           ) : null}
 
-          <div className="grid min-h-0 grid-cols-[minmax(0,1fr)_minmax(420px,36vw)] gap-2 lg:gap-3">
+          <div className="grid min-h-0 grid-cols-1 gap-2 lg:gap-3">
             <section
               className={`min-h-0 rounded-xl border p-2 ${
                 heroMode === "new"
@@ -164,7 +164,6 @@ export default function MonitorPage() {
             >
               {featuredOrder ? <NewOrderHero order={featuredOrder} flash={flashId === featuredOrder.id} mode={heroMode} /> : <EmptyHero />}
             </section>
-            <DayProductPanel title="今日の商品数" date={displayDate(today)} stats={todayProductStats} compact />
           </div>
 
           <div className="grid min-h-0 grid-cols-[minmax(0,1fr)_minmax(420px,36vw)] gap-2 lg:gap-3">
@@ -200,7 +199,7 @@ export default function MonitorPage() {
             </section>
 
             <aside className="grid min-h-0 grid-rows-[1fr_1fr] gap-2 lg:gap-3">
-              <DayProductPanel title="今日の必要数" date={displayDate(today)} stats={todayProductStats} />
+              <DayProductPanel title="今日の必要数" date={displayDate(today)} stats={todayProductStats} highlight />
               <DayProductPanel title="明日の必要数" date={displayDate(tomorrow)} stats={tomorrowProductStats} />
             </aside>
           </div>
@@ -388,54 +387,30 @@ function DayProductPanel({
   title,
   date,
   stats,
-  compact = false
+  highlight = false
 }: {
   title: string;
   date: string;
   stats: ReturnType<typeof summarizeRemainingOrders>;
-  compact?: boolean;
+  highlight?: boolean;
 }) {
-  if (compact) {
-    return (
-      <section className="min-h-0 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] px-2 py-1.5">
-        <div className="flex h-full min-w-0 items-center gap-2">
-          <div className="shrink-0">
-            <h2 className="text-[clamp(0.8rem,1vw,0.95rem)] font-black leading-tight">{title}</h2>
-            <div className="text-[clamp(0.68rem,0.8vw,0.75rem)] font-black leading-tight text-slate-300">
-              {date} / 合計 {stats.totalItems} 個
-            </div>
-          </div>
-          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1 overflow-hidden">
-            {stats.productTotals.slice(0, 4).map((item) => (
-              <div key={item.product_name} className="inline-flex max-w-[46%] items-center gap-1 rounded-md border border-white/10 bg-white/[0.04] px-2 py-1">
-                <span className="truncate text-[clamp(0.72rem,0.9vw,0.85rem)] font-bold text-slate-100">{item.product_name}</span>
-                <span className="shrink-0 text-[clamp(0.9rem,1.2vw,1.1rem)] font-black leading-none text-white">{item.quantity}<span className="ml-0.5 text-[0.62rem]">個</span></span>
-              </div>
-            ))}
-            {stats.productTotals.length === 0 ? <div className="text-[clamp(0.72rem,0.9vw,0.85rem)] font-bold text-slate-400">未完了の商品はありません</div> : null}
-          </div>
-        </div>
-      </section>
-    );
-  }
-
   return (
-    <section className="min-h-0 rounded-xl border border-white/10 bg-white/[0.04] p-2 xl:p-3">
-      <div className="mb-2 flex items-end justify-between">
+    <section className={`min-h-0 rounded-xl border p-2 xl:p-3 ${highlight ? "border-sky-400/45 bg-sky-500/12 shadow-[0_0_20px_rgba(56,189,248,0.12)]" : "border-white/10 bg-white/[0.04]"}`}>
+      <div className="mb-3 flex items-end justify-between">
         <div>
-          <h2 className="text-[clamp(1.15rem,1.55vw,1.45rem)] font-black leading-tight">{title}</h2>
+          <h2 className={highlight ? "text-[clamp(1.35rem,1.9vw,1.8rem)] font-black leading-tight text-white" : "text-[clamp(1.15rem,1.55vw,1.45rem)] font-black leading-tight"}>{title}</h2>
           <div className="text-[clamp(0.72rem,0.9vw,0.85rem)] font-black text-slate-400">{date}</div>
         </div>
         <div className="text-right">
-          <div className="text-[clamp(1.8rem,2.8vw,2.6rem)] font-black leading-none text-white">{stats.totalItems}<span className="ml-1 text-[0.85rem]">個</span></div>
+          <div className={highlight ? "text-[clamp(2.3rem,3.5vw,3.25rem)] font-black leading-none text-white" : "text-[clamp(1.8rem,2.8vw,2.6rem)] font-black leading-none text-white"}>{stats.totalItems}<span className="ml-1 text-[0.85rem]">個</span></div>
           <div className="text-[clamp(0.68rem,0.8vw,0.76rem)] font-black text-slate-400">未完了分</div>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-1.5">
+      <div className={highlight ? "grid grid-cols-2 gap-2" : "grid grid-cols-2 gap-1.5"}>
         {stats.productTotals.map((item) => (
-          <div key={item.product_name} className="flex min-w-0 items-center justify-between gap-2 rounded-md border border-white/10 bg-white/[0.04] px-2 py-1.5">
-            <div className="min-w-0 truncate text-[clamp(0.82rem,1vw,1rem)] font-black text-slate-100">{item.product_name}</div>
-            <div className="shrink-0 text-[clamp(1.25rem,1.75vw,1.7rem)] font-black leading-none text-white">{item.quantity}<span className="ml-1 text-[0.7rem]">個</span></div>
+          <div key={item.product_name} className={highlight ? "flex min-w-0 items-center justify-between gap-2 rounded-md border border-sky-300/15 bg-white/[0.07] px-2.5 py-2" : "flex min-w-0 items-center justify-between gap-2 rounded-md border border-white/10 bg-white/[0.04] px-2 py-1.5"}>
+            <div className={highlight ? "min-w-0 truncate text-[clamp(0.95rem,1.15vw,1.08rem)] font-black text-slate-50" : "min-w-0 truncate text-[clamp(0.82rem,1vw,1rem)] font-black text-slate-100"}>{item.product_name}</div>
+            <div className={highlight ? "shrink-0 text-[clamp(1.55rem,2.15vw,2rem)] font-black leading-none text-white" : "shrink-0 text-[clamp(1.25rem,1.75vw,1.7rem)] font-black leading-none text-white"}>{item.quantity}<span className="ml-1 text-[0.7rem]">個</span></div>
           </div>
         ))}
         {stats.productTotals.length === 0 ? <div className="col-span-2 rounded-md border border-white/10 bg-white/[0.03] p-3 text-slate-400">未完了の商品はありません。</div> : null}
