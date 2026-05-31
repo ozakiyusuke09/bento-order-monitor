@@ -94,7 +94,7 @@ export default function MonitorPage() {
   return (
     <AuthGuard>
       <main className="h-screen overflow-hidden bg-[#06101a] p-2 text-white lg:p-3">
-        <div className="mx-auto grid h-full w-full max-w-[1900px] grid-rows-[auto_minmax(54px,7dvh)_minmax(0,1fr)] gap-2 rounded-xl border border-slate-700 bg-gradient-to-br from-[#07131f] via-[#091923] to-[#03070c] p-2 shadow-2xl lg:gap-3 lg:p-3">
+        <div className="mx-auto grid h-full w-full max-w-[1900px] grid-rows-[auto_minmax(0,1fr)] gap-2 rounded-xl border border-slate-700 bg-gradient-to-br from-[#07131f] via-[#091923] to-[#03070c] p-2 shadow-2xl lg:gap-3 lg:p-3">
           <header className="grid min-w-0 grid-cols-[minmax(240px,1fr)_auto] items-center gap-3 border-b border-white/10 pb-2">
             <div className="flex min-w-0 items-center gap-3">
               <div className="rounded-lg border border-white/10 bg-white/10 p-2">
@@ -152,9 +152,9 @@ export default function MonitorPage() {
             </div>
           ) : null}
 
-          <div className="grid min-h-0 grid-cols-1 gap-2 lg:gap-3">
+          <div className="grid min-h-0 grid-cols-[minmax(0,1fr)_minmax(420px,36vw)] grid-rows-[minmax(54px,7dvh)_minmax(0,1fr)] gap-2 lg:gap-3">
             <section
-              className={`min-h-0 rounded-xl border p-2 ${
+              className={`col-start-1 row-start-1 min-h-0 rounded-xl border p-2 ${
                 heroMode === "new"
                   ? "border-red-400 bg-red-500/10 shadow-[0_0_24px_rgba(248,113,113,0.22)]"
                   : featuredOrder
@@ -164,10 +164,8 @@ export default function MonitorPage() {
             >
               {featuredOrder ? <NewOrderHero order={featuredOrder} flash={flashId === featuredOrder.id} mode={heroMode} /> : <EmptyHero />}
             </section>
-          </div>
 
-          <div className="grid min-h-0 grid-cols-[minmax(0,1fr)_minmax(420px,36vw)] gap-2 lg:gap-3">
-            <section className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-2 lg:gap-3">
+            <section className="col-start-1 row-start-2 grid min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-2 lg:gap-3">
               <div className="grid grid-cols-[repeat(5,minmax(0,1fr))_auto] items-stretch gap-1.5 lg:gap-2">
                 <MonitorStatusCard label="新規" count={stats.statusCounts.new} tone="red" />
                 <MonitorStatusCard label="確認済み" count={stats.statusCounts.confirmed} tone="amber" />
@@ -198,7 +196,7 @@ export default function MonitorPage() {
               </section>
             </section>
 
-            <aside className="grid min-h-0 grid-rows-[1fr_1fr] gap-2 lg:gap-3">
+            <aside className="col-start-2 row-span-2 row-start-1 grid min-h-0 grid-rows-[1fr_1fr] gap-2 lg:gap-3">
               <DayProductPanel title="今日の必要数" date={displayDate(today)} stats={todayProductStats} highlight />
               <DayProductPanel title="明日の必要数" date={displayDate(tomorrow)} stats={tomorrowProductStats} />
             </aside>
