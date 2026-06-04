@@ -32,9 +32,11 @@ npm run dev
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
+GOOGLE_FORM_IMPORT_SECRET=
 ```
 
 `SUPABASE_SERVICE_ROLE_KEY` はサーバー側専用です。ブラウザで読み込むコードや `NEXT_PUBLIC_` には絶対に入れないでください。
+`GOOGLE_FORM_IMPORT_SECRET` は Google Apps Script からの注文取込APIを認証する共有シークレットです。GitHubには実値を書かないでください。
 
 ## Supabase準備
 
@@ -43,6 +45,8 @@ SUPABASE_SERVICE_ROLE_KEY=
 3. 必要に応じて `supabase/seed.sql` を実行します。
 4. Authenticationでテストスタッフのメールアドレスとパスワードを作成します。
 5. `.env.local` にURLとAnon Keyを設定します。
+
+Googleフォーム取込を使う場合は、追加で `supabase/google-form-imports.sql` を実行します。
 
 ## Realtime
 

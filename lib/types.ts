@@ -2,7 +2,7 @@ export type OrderStatus = "new" | "confirmed" | "cooking" | "completed" | "cance
 export type ReceiveType = "pickup" | "delivery";
 export type RiceOption = "normal" | "large" | "small" | "none";
 export type PaymentMethod = "cash" | "invoice" | "cashless" | "other";
-export type OrderSource = "manual" | "web" | "line" | "email" | "phone";
+export type OrderSource = "manual" | "web" | "line" | "email" | "phone" | "google_form";
 
 export type Product = {
   id: string;
