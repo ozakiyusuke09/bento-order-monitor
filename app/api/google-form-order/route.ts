@@ -12,7 +12,14 @@ export async function POST(request: Request) {
   const actualSecret = request.headers.get("x-google-form-import-secret");
 
   if (!expectedSecret || actualSecret !== expectedSecret) {
-    return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      {
+        ok: false,
+        error: "Unauthorized",
+        diagnostics: buildUnauthorizedDiagnostics(expectedSecret, actualSecret)
+      },
+      { status: 401 }
+    );
   }
 
   let payload: GoogleFormImportPayload;
@@ -237,4 +244,24 @@ function safeText(value: unknown) {
 function parseSheetRowNumber(value: unknown) {
   const number = Number(safeText(value));
   return Number.isInteger(number) && number > 0 ? number : null;
+}
+
+function buildUnauthorizedDiagnostics(expectedSecret: string | undefined, actualSecret: string | null) {
+  const expectedSecretExists = Boolean(expectedSecret);
+  const actualSecretExists = Boolean(actualSecret);
+  const expectedSecretLength = expectedSecret?.length ?? 0;
+  const actualSecretLength = actualSecret?.length ?? 0;
+  const reason = !expectedSecretExists
+    ? "missing_server_secret"
+    : !actualSecretExists
+      ? "missing_request_secret"
+      : "secret_mismatch";
+
+  return {
+    expectedSecretExists,
+    actualSecretExists,
+    expectedSecretLength,
+    actualSecretLength,
+    reason
+  };
 }

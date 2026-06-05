@@ -24,9 +24,15 @@ function onFormSubmit(e) {
   const props = PropertiesService.getScriptProperties();
   const apiUrl = props.getProperty('ORDER_API_URL');
   const apiSecret = props.getProperty('ORDER_API_SECRET');
+  const apiUrlExists = Boolean(apiUrl);
+  const apiSecretExists = Boolean(apiSecret);
 
-  if (!apiUrl || !apiSecret) {
-    throw new Error('ORDER_API_URL / ORDER_API_SECRET が未設定です。');
+  console.log('ORDER_API_URL exists=' + apiUrlExists);
+  console.log('ORDER_API_SECRET exists=' + apiSecretExists);
+  console.log('ORDER_API_SECRET length=' + (apiSecret ? apiSecret.length : 0));
+
+  if (!apiUrlExists || !apiSecretExists) {
+    throw new Error('ORDER_API_URL / ORDER_API_SECRET が未設定です。secret実値はログに出していません。');
   }
 
   const sheet = e.range.getSheet();
@@ -61,9 +67,14 @@ function onFormSubmit(e) {
   });
 
   const statusCode = response.getResponseCode();
+  const responseBody = response.getContentText();
   if (statusCode < 200 || statusCode >= 300) {
-    throw new Error('注文取込APIが失敗しました。status=' + statusCode);
+    console.log('注文取込APIが失敗しました。status=' + statusCode);
+    console.log('API response body=' + responseBody);
+    throw new Error('注文取込APIが失敗しました。status=' + statusCode + ' secretLength=' + apiSecret.length);
   }
+
+  console.log('注文取込API成功。status=' + statusCode + ' body=' + responseBody);
 }
 ```
 
