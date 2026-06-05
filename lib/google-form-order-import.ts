@@ -17,6 +17,7 @@ export type GoogleFormImportPayload = {
   sheetRowNumber?: number | string | null;
   timestamp?: string | null;
   answers?: Record<string, unknown>;
+  secret?: string | null;
 };
 
 export type ParsedGoogleFormOrder = {

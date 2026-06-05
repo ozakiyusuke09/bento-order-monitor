@@ -9,24 +9,24 @@ type ImportStatus = "imported" | "duplicate" | "error" | "pending_review";
 
 export async function POST(request: Request) {
   const expectedSecret = process.env.GOOGLE_FORM_IMPORT_SECRET;
-  const actualSecret = request.headers.get("x-google-form-import-secret");
-
-  if (!expectedSecret || actualSecret !== expectedSecret) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: "Unauthorized",
-        diagnostics: buildUnauthorizedDiagnostics(expectedSecret, actualSecret)
-      },
-      { status: 401 }
-    );
-  }
-
   let payload: GoogleFormImportPayload;
   try {
     payload = (await request.json()) as GoogleFormImportPayload;
   } catch {
     return NextResponse.json({ ok: false, error: "Invalid JSON" }, { status: 400 });
+  }
+  const headerSecret = request.headers.get("x-google-form-import-secret");
+  const bodySecret = typeof payload.secret === "string" ? payload.secret : null;
+
+  if (!isAuthorized(expectedSecret, headerSecret, bodySecret)) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: "Unauthorized",
+        diagnostics: buildUnauthorizedDiagnostics(expectedSecret, headerSecret, bodySecret)
+      },
+      { status: 401 }
+    );
   }
 
   const supabase = getSupabaseAdmin();
@@ -246,22 +246,31 @@ function parseSheetRowNumber(value: unknown) {
   return Number.isInteger(number) && number > 0 ? number : null;
 }
 
-function buildUnauthorizedDiagnostics(expectedSecret: string | undefined, actualSecret: string | null) {
+function isAuthorized(expectedSecret: string | undefined, headerSecret: string | null, bodySecret: string | null) {
+  if (!expectedSecret) return false;
+  return headerSecret === expectedSecret || bodySecret === expectedSecret;
+}
+
+function buildUnauthorizedDiagnostics(expectedSecret: string | undefined, headerSecret: string | null, bodySecret: string | null) {
   const expectedSecretExists = Boolean(expectedSecret);
-  const actualSecretExists = Boolean(actualSecret);
+  const headerSecretExists = Boolean(headerSecret);
+  const bodySecretExists = Boolean(bodySecret);
   const expectedSecretLength = expectedSecret?.length ?? 0;
-  const actualSecretLength = actualSecret?.length ?? 0;
+  const headerSecretLength = headerSecret?.length ?? 0;
+  const bodySecretLength = bodySecret?.length ?? 0;
   const reason = !expectedSecretExists
     ? "missing_server_secret"
-    : !actualSecretExists
+    : !headerSecretExists && !bodySecretExists
       ? "missing_request_secret"
       : "secret_mismatch";
 
   return {
     expectedSecretExists,
-    actualSecretExists,
+    headerSecretExists,
+    bodySecretExists,
     expectedSecretLength,
-    actualSecretLength,
+    headerSecretLength,
+    bodySecretLength,
     reason
   };
 }

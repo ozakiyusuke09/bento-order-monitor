@@ -53,7 +53,8 @@ function onFormSubmit(e) {
   const payload = {
     sheetRowNumber: row,
     timestamp: answers['タイムスタンプ'],
-    answers: answers
+    answers: answers,
+    secret: apiSecret
   };
 
   const response = UrlFetchApp.fetch(apiUrl, {
