@@ -22,8 +22,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         ok: false,
-        error: "Unauthorized",
-        diagnostics: buildUnauthorizedDiagnostics(expectedSecret, headerSecret, bodySecret)
+        error: "Unauthorized"
       },
       { status: 401 }
     );
@@ -249,28 +248,4 @@ function parseSheetRowNumber(value: unknown) {
 function isAuthorized(expectedSecret: string | undefined, headerSecret: string | null, bodySecret: string | null) {
   if (!expectedSecret) return false;
   return headerSecret === expectedSecret || bodySecret === expectedSecret;
-}
-
-function buildUnauthorizedDiagnostics(expectedSecret: string | undefined, headerSecret: string | null, bodySecret: string | null) {
-  const expectedSecretExists = Boolean(expectedSecret);
-  const headerSecretExists = Boolean(headerSecret);
-  const bodySecretExists = Boolean(bodySecret);
-  const expectedSecretLength = expectedSecret?.length ?? 0;
-  const headerSecretLength = headerSecret?.length ?? 0;
-  const bodySecretLength = bodySecret?.length ?? 0;
-  const reason = !expectedSecretExists
-    ? "missing_server_secret"
-    : !headerSecretExists && !bodySecretExists
-      ? "missing_request_secret"
-      : "secret_mismatch";
-
-  return {
-    expectedSecretExists,
-    headerSecretExists,
-    bodySecretExists,
-    expectedSecretLength,
-    headerSecretLength,
-    bodySecretLength,
-    reason
-  };
 }
