@@ -3,6 +3,7 @@ export type ReceiveType = "pickup" | "delivery";
 export type RiceOption = "normal" | "large" | "small" | "none";
 export type PaymentMethod = "cash" | "invoice" | "cashless" | "other";
 export type OrderSource = "manual" | "web" | "line" | "email" | "phone" | "google_form";
+export type GoogleFormImportStatus = "imported" | "pending_review" | "error" | "duplicate";
 
 export type Product = {
   id: string;
@@ -114,4 +115,15 @@ export type DashboardStats = {
   attachmentCount: number;
   pickupCount: number;
   deliveryCount: number;
+};
+
+export type GoogleFormImportRecord = {
+  id: string;
+  created_at: string;
+  form_timestamp: string | null;
+  phone: string | null;
+  status: GoogleFormImportStatus;
+  error_message: string | null;
+  imported_order_id: string | null;
+  sheet_row_number: number | null;
 };

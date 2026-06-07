@@ -69,13 +69,30 @@ function onFormSubmit(e) {
 
   const statusCode = response.getResponseCode();
   const responseBody = response.getContentText();
-  if (statusCode < 200 || statusCode >= 300) {
-    console.log('注文取込APIが失敗しました。status=' + statusCode);
-    console.log('API response body=' + responseBody);
-    throw new Error('注文取込APIが失敗しました。status=' + statusCode + ' secretLength=' + apiSecret.length);
+
+  if (statusCode >= 200 && statusCode < 300) {
+    console.log('注文取込API成功。status=' + statusCode + ' body=' + responseBody);
+    return;
   }
 
-  console.log('注文取込API成功。status=' + statusCode + ' body=' + responseBody);
+  if (statusCode === 422) {
+    console.log('注文取込API: 要確認として記録済みです。status=' + statusCode);
+    console.log('API response body=' + responseBody);
+    return;
+  }
+
+  console.log('注文取込APIが失敗しました。status=' + statusCode);
+  console.log('API response body=' + responseBody);
+
+  if (statusCode === 401) {
+    throw new Error('注文取込APIの認証に失敗しました。ORDER_API_SECRETを確認してください。secretLength=' + apiSecret.length);
+  }
+
+  if (statusCode >= 500) {
+    throw new Error('注文取込APIでサーバーエラーが発生しました。status=' + statusCode);
+  }
+
+  throw new Error('注文取込APIが失敗しました。status=' + statusCode);
 }
 ```
 
