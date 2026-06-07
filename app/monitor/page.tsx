@@ -5,9 +5,9 @@ import type { MutableRefObject } from "react";
 import Link from "next/link";
 import {
   Bell,
-  Clock,
   ShoppingBag,
   Volume2,
+  VolumeX,
 } from "lucide-react";
 import { AuthGuard } from "@/components/auth-guard";
 import { StatusBadge } from "@/components/status-badge";
@@ -21,18 +21,25 @@ import type { OrderWithRelations } from "@/lib/types";
 export default function MonitorPage() {
   const { orders } = useOrders(todayString(), "monitor");
   const { orders: tomorrowOrders } = useOrders(tomorrowString(), "tomorrow");
+  const { orders: incompleteOrders } = useOrders(todayString(), "incomplete");
   const stats = summarizeOrders(orders);
   const today = todayString();
   const tomorrow = tomorrowString();
   const todayOrders = useMemo(() => orders.filter((order) => order.pickup_date === today), [orders, today]);
   const todayProductStats = summarizeRemainingOrders(todayOrders);
   const tomorrowProductStats = summarizeRemainingOrders(tomorrowOrders);
+  const recentOrders = useMemo(
+    () => [...incompleteOrders].sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 5),
+    [incompleteOrders]
+  );
   const [now, setNow] = useState(new Date());
   const [flashId, setFlashId] = useState<string | null>(null);
-  const [soundEnabled, setSoundEnabled] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [soundReady, setSoundReady] = useState(false);
   const [newOrderNotice, setNewOrderNotice] = useState(false);
   const seenOrderIdsRef = useRef<Set<string> | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
+  const lastSoundAtRef = useRef(0);
   const flashTimerRef = useRef<number | null>(null);
   const noticeTimerRef = useRef<number | null>(null);
 
@@ -49,19 +56,25 @@ export default function MonitorPage() {
   }, []);
 
   useEffect(() => {
-    const currentIds = new Set(orders.map((order) => order.id));
+    const currentIds = new Set(incompleteOrders.map((order) => order.id));
     if (!seenOrderIdsRef.current) {
       seenOrderIdsRef.current = currentIds;
       return;
     }
 
-    const addedOrder = orders.find((order) => !seenOrderIdsRef.current?.has(order.id));
+    const addedOrder = [...incompleteOrders]
+      .filter((order) => !seenOrderIdsRef.current?.has(order.id))
+      .sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
     seenOrderIdsRef.current = currentIds;
     if (!addedOrder) return;
 
     setFlashId(addedOrder.id);
     setNewOrderNotice(true);
-    if (soundEnabled) playNotificationSound(audioContextRef);
+    const nowMs = Date.now();
+    if (soundEnabled && nowMs - lastSoundAtRef.current > 4000) {
+      lastSoundAtRef.current = nowMs;
+      playNotificationSound(audioContextRef);
+    }
 
     if (flashTimerRef.current) window.clearTimeout(flashTimerRef.current);
     if (noticeTimerRef.current) window.clearTimeout(noticeTimerRef.current);
@@ -73,22 +86,15 @@ export default function MonitorPage() {
       setNewOrderNotice(false);
       noticeTimerRef.current = null;
     }, 5000);
-  }, [orders, soundEnabled]);
+  }, [incompleteOrders, soundEnabled]);
 
-  const activeOrders = useMemo(
-    () => orders.filter((order) => order.status !== "completed" && order.status !== "cancelled"),
-    [orders]
-  );
-  const newestNewOrder =
-    [...orders].filter((order) => order.status === "new").sort((a, b) => b.created_at.localeCompare(a.created_at))[0] ??
-    null;
-  const featuredOrder = newestNewOrder ?? activeOrders[0] ?? orders[0];
-  const heroMode = featuredOrder?.status === "new" ? "new" : "active";
-
-  async function enableSound() {
-    await getAudioContext(audioContextRef)?.resume();
+  async function testSound() {
+    const context = getAudioContext(audioContextRef);
+    if (!context) return;
+    await context.resume();
     setSoundEnabled(true);
-    playNotificationSound(audioContextRef);
+    setSoundReady(context.state === "running");
+    playNotificationSound(audioContextRef, true);
   }
 
   return (
@@ -121,15 +127,26 @@ export default function MonitorPage() {
                 </Link>
                 <button
                   type="button"
-                  onClick={enableSound}
+                  onClick={() => setSoundEnabled((current) => !current)}
                   className={
                     soundEnabled
                       ? "inline-flex items-center gap-1 rounded-md border border-emerald-400/40 bg-emerald-500/20 px-[clamp(0.55rem,1vw,0.85rem)] py-[clamp(0.45rem,0.8vw,0.65rem)] text-[clamp(0.72rem,0.9vw,0.9rem)] font-black text-emerald-100"
                       : "inline-flex items-center gap-1 rounded-md border border-white/15 bg-white/10 px-[clamp(0.55rem,1vw,0.85rem)] py-[clamp(0.45rem,0.8vw,0.65rem)] text-[clamp(0.72rem,0.9vw,0.9rem)] font-black text-slate-100 hover:bg-white/15"
                   }
                 >
-                  <Volume2 className="h-4 w-4" />
-                  通知音ON
+                  {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+                  {soundEnabled ? "通知ON" : "通知OFF"}
+                </button>
+                <button
+                  type="button"
+                  onClick={testSound}
+                  className={
+                    soundReady
+                      ? "rounded-md border border-white/15 bg-white/10 px-[clamp(0.5rem,0.9vw,0.75rem)] py-[clamp(0.45rem,0.8vw,0.65rem)] text-[clamp(0.68rem,0.85vw,0.82rem)] font-black text-slate-100 hover:bg-white/15"
+                      : "rounded-md border border-amber-300/50 bg-amber-500/20 px-[clamp(0.5rem,0.9vw,0.75rem)] py-[clamp(0.45rem,0.8vw,0.65rem)] text-[clamp(0.68rem,0.85vw,0.82rem)] font-black text-amber-100 hover:bg-amber-500/30"
+                  }
+                >
+                  {soundReady ? "音テスト" : "音を有効化"}
                 </button>
               </nav>
               <div className="h-[clamp(2.2rem,4vw,4rem)] w-px bg-white/15" />
@@ -152,17 +169,11 @@ export default function MonitorPage() {
             </div>
           ) : null}
 
-          <div className="grid min-h-0 grid-cols-[minmax(0,1fr)_minmax(420px,36vw)] grid-rows-[minmax(54px,7dvh)_minmax(0,1fr)] gap-2 lg:gap-3">
+          <div className="grid min-h-0 grid-cols-[minmax(0,1fr)_minmax(420px,36vw)] grid-rows-[minmax(108px,14dvh)_minmax(0,1fr)] gap-2 lg:gap-3">
             <section
-              className={`col-start-1 row-start-1 min-h-0 rounded-xl border p-2 ${
-                heroMode === "new"
-                  ? "border-red-400 bg-red-500/10 shadow-[0_0_24px_rgba(248,113,113,0.22)]"
-                  : featuredOrder
-                    ? "border-sky-400/50 bg-sky-500/10"
-                  : "border-white/10 bg-white/5"
-              }`}
+              className="col-start-1 row-start-1 min-h-0 rounded-xl border border-red-400/45 bg-red-500/10 p-2 shadow-[0_0_24px_rgba(248,113,113,0.16)]"
             >
-              {featuredOrder ? <NewOrderHero order={featuredOrder} flash={flashId === featuredOrder.id} mode={heroMode} /> : <EmptyHero />}
+              <RecentOrdersHero orders={recentOrders} flashId={flashId} today={today} tomorrow={tomorrow} />
             </section>
 
             <section className="col-start-1 row-start-2 grid min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-2 lg:gap-3">
@@ -207,72 +218,91 @@ export default function MonitorPage() {
   );
 }
 
-function NewOrderHero({ order, flash, mode }: { order: OrderWithRelations; flash: boolean; mode: "new" | "active" }) {
-  const mainItem = order.items[0];
-  const itemText = order.items.map((item) => `${item.product_name} x${item.quantity}`).join(" / ");
-  const isNew = mode === "new";
-  const iconClass = isNew
-    ? "bg-red-600 shadow-[0_0_24px_rgba(239,68,68,0.55)]"
-    : "bg-sky-600 shadow-[0_0_24px_rgba(56,189,248,0.28)]";
-  const badgeClass = isNew ? "bg-red-600" : "bg-sky-600";
-  const dividerClass = isNew ? "border-red-300/30" : "border-sky-300/30";
+function RecentOrdersHero({
+  orders,
+  flashId,
+  today,
+  tomorrow
+}: {
+  orders: OrderWithRelations[];
+  flashId: string | null;
+  today: string;
+  tomorrow: string;
+}) {
+  if (orders.length === 0) {
+    return <EmptyHero />;
+  }
 
   return (
-    <div className={`grid h-full grid-cols-[44px_minmax(0,1fr)] items-center gap-2 ${flash ? "animate-pulse" : ""}`}>
-      <div className={`flex h-11 w-11 items-center justify-center rounded-full text-white ${iconClass}`}>
-        {isNew ? <Bell className="h-6 w-6" /> : <Clock className="h-6 w-6" />}
+    <div className="grid h-full min-h-0 grid-cols-[44px_minmax(0,1fr)] items-center gap-2">
+      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-red-600 text-white shadow-[0_0_24px_rgba(239,68,68,0.45)]">
+        <Bell className="h-6 w-6" />
       </div>
-      <div className={`grid min-w-0 grid-cols-[minmax(88px,0.55fr)_70px_minmax(92px,0.8fr)_minmax(160px,1.6fr)_58px_minmax(80px,0.8fr)] items-center gap-2 border-l pl-2 lg:gap-3 ${dividerClass}`}>
-        <div className="flex min-w-0 items-center gap-1.5">
-          <span className={`shrink-0 rounded px-1.5 py-0.5 text-[0.68rem] font-black leading-none text-white ${badgeClass}`}>
-            {isNew ? "NEW" : "ACTIVE"}
-          </span>
-          <span className="shrink-0 rounded border border-white/15 bg-white/10 px-1.5 py-0.5 text-[0.68rem] font-black leading-none text-slate-100">
-            {displayShortOrderNumber(order)}
-          </span>
+      <div className="grid min-h-0 min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-2 border-l border-red-300/30 pl-2">
+        <div className="min-w-[74px]">
+          <div className="rounded bg-red-600 px-2 py-1 text-center text-[0.78rem] font-black leading-none text-white">NEW</div>
+          <div className="mt-1 text-center text-[0.66rem] font-black text-red-100">新着注文</div>
         </div>
-        <HeroField label="受付" value={displayTime(order.pickup_time)} large />
-        <HeroField label="注文者" value={order.customer_name} />
-        <HeroField label="商品・数量" value={mainItem ? itemText : "-"} />
-        <div className="min-w-0">
-          <div className="text-[0.62rem] font-black leading-tight text-slate-300">受取</div>
-          <span className={`mt-0.5 inline-flex max-w-full rounded px-1.5 py-0.5 text-[0.72rem] font-black leading-none text-white ${badgeClass}`}>
-            {receiveTypeLabels[order.receive_type]}
-          </span>
+        <div className="grid min-w-0 grid-cols-5 gap-1.5">
+          {orders.map((order) => (
+            <RecentOrderCard key={order.id} order={order} flash={flashId === order.id} today={today} tomorrow={tomorrow} />
+          ))}
         </div>
-        <HeroField label="備考" value={order.note || order.delivery_address || "なし"} accent={Boolean(order.note || order.delivery_address)} />
       </div>
     </div>
+  );
+}
+
+function RecentOrderCard({ order, flash, today, tomorrow }: { order: OrderWithRelations; flash: boolean; today: string; tomorrow: string }) {
+  const quantity = order.items.reduce((sum, item) => sum + item.quantity, 0);
+  const items = order.items.map((item) => `${item.product_name} x${item.quantity}`).join(" / ") || "-";
+  const dateLabel = getMonitorDateLabel(order.pickup_date, today, tomorrow);
+  const isToday = order.pickup_date === today;
+  const detail = order.receive_type === "delivery" ? order.delivery_address || "住所未入力" : order.note || "";
+  const note = order.receive_type === "delivery" && order.note ? `備考: ${order.note}` : detail;
+
+  return (
+    <Link
+      href={`/orders/${order.id}`}
+      aria-label={`${order.customer_name}の新着注文詳細を開く`}
+      className={`min-w-0 rounded-lg border px-2 py-1.5 transition hover:bg-white/[0.08] ${
+        flash ? "animate-pulse border-red-300 bg-red-500/25" : "border-white/10 bg-white/[0.05]"
+      }`}
+    >
+      <div className="flex min-w-0 items-center justify-between gap-1">
+        <span className={isToday ? "rounded bg-white/10 px-1.5 py-0.5 text-[0.62rem] font-black text-slate-200" : "rounded bg-red-600 px-1.5 py-0.5 text-[0.62rem] font-black text-white"}>
+          {dateLabel}
+        </span>
+        <span className="rounded bg-red-600 px-1 py-0.5 text-[0.58rem] font-black leading-none text-white">NEW</span>
+        <span className="truncate text-[0.68rem] font-black text-red-100">{displayShortOrderNumber(order)}</span>
+      </div>
+      <div className="mt-1 flex items-baseline gap-1">
+        <span className="text-[clamp(0.95rem,1.15vw,1.15rem)] font-black leading-none text-white">{displayTime(order.pickup_time)}</span>
+        <span className="min-w-0 truncate text-[clamp(0.78rem,0.95vw,0.9rem)] font-black text-white">{order.customer_name}</span>
+      </div>
+      <div className="mt-0.5 truncate text-[clamp(0.68rem,0.82vw,0.78rem)] font-black text-slate-100" title={items}>
+        {items}
+      </div>
+      <div className="mt-0.5 flex min-w-0 items-center justify-between gap-1 text-[0.68rem] font-black text-slate-300">
+        <span className="truncate">{receiveTypeLabels[order.receive_type]} {note ? `/ ${note}` : ""}</span>
+        <span className="shrink-0 text-red-100">x {quantity}</span>
+      </div>
+    </Link>
   );
 }
 
 function EmptyHero() {
   return (
     <div className="flex h-full min-h-10 items-center justify-center text-lg font-black text-slate-400">
-      本日の注文はまだありません。
+      未完了の新着注文はありません。
     </div>
   );
 }
 
-function HeroField({
-  label,
-  value,
-  large = false,
-  accent = false
-}: {
-  label: string;
-  value: string;
-  large?: boolean;
-  accent?: boolean;
-}) {
-  return (
-    <div className="min-w-0">
-      <div className="text-[0.62rem] font-black leading-tight text-slate-300">{label}</div>
-      <div className={`mt-0.5 truncate font-black leading-tight ${large ? "text-[clamp(0.95rem,1.4vw,1.2rem)]" : "text-[clamp(0.82rem,1.1vw,1rem)]"} ${accent ? "text-red-300" : "text-white"}`}>
-        {value}
-      </div>
-    </div>
-  );
+function getMonitorDateLabel(date: string, today: string, tomorrow: string) {
+  if (date === today) return "今日";
+  if (date === tomorrow) return "明日";
+  return `予約 ${Number(date.slice(5, 7))}/${Number(date.slice(8, 10))}`;
 }
 
 function MonitorStatusCard({
@@ -364,21 +394,28 @@ function getAudioContext(ref: MutableRefObject<AudioContext | null>) {
   return ref.current;
 }
 
-function playNotificationSound(ref: MutableRefObject<AudioContext | null>) {
+function playNotificationSound(ref: MutableRefObject<AudioContext | null>, force = false) {
   const context = getAudioContext(ref);
   if (!context) return;
+  if (!force && context.state !== "running") return;
+  [0, 0.58, 1.16].forEach((offset) => {
+    playTone(context, context.currentTime + offset, 880, 0.2);
+    playTone(context, context.currentTime + offset + 0.18, 660, 0.18);
+  });
+}
+
+function playTone(context: AudioContext, startAt: number, frequency: number, duration: number) {
   const oscillator = context.createOscillator();
   const gain = context.createGain();
   oscillator.type = "sine";
-  oscillator.frequency.setValueAtTime(880, context.currentTime);
-  oscillator.frequency.setValueAtTime(660, context.currentTime + 0.12);
-  gain.gain.setValueAtTime(0.001, context.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.18, context.currentTime + 0.02);
-  gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.35);
+  oscillator.frequency.setValueAtTime(frequency, startAt);
+  gain.gain.setValueAtTime(0.001, startAt);
+  gain.gain.exponentialRampToValueAtTime(0.28, startAt + 0.025);
+  gain.gain.exponentialRampToValueAtTime(0.001, startAt + duration);
   oscillator.connect(gain);
   gain.connect(context.destination);
-  oscillator.start();
-  oscillator.stop(context.currentTime + 0.38);
+  oscillator.start(startAt);
+  oscillator.stop(startAt + duration + 0.03);
 }
 
 function MonitorItemBreakdown({ order }: { order: OrderWithRelations }) {
