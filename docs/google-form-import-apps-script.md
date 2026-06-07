@@ -17,6 +17,16 @@ ORDER_API_SECRET=Vercel の GOOGLE_FORM_IMPORT_SECRET と同じ値
 ORDER_API_URL=https://bento-order-monitor.vercel.app/api/google-form-order
 ```
 
+## 受注システム側の環境変数
+
+`/admin` の「Googleフォーム取込状況」から回答先スプレッドシートを確認できるように、Vercel側に以下を設定してください。
+
+```text
+GOOGLE_FORM_RESPONSE_SHEET_URL=https://docs.google.com/spreadsheets/d/xxxxx/edit?gid=xxxxx
+```
+
+`sheet_row_number` がある取込履歴では、このURLに行番号の範囲を付けて「回答先を確認」リンクを表示します。
+
 ## サンプルコード
 
 ```javascript

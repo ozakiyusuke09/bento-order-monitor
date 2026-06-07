@@ -33,10 +33,12 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 GOOGLE_FORM_IMPORT_SECRET=
+GOOGLE_FORM_RESPONSE_SHEET_URL=
 ```
 
 `SUPABASE_SERVICE_ROLE_KEY` はサーバー側専用です。ブラウザで読み込むコードや `NEXT_PUBLIC_` には絶対に入れないでください。
 `GOOGLE_FORM_IMPORT_SECRET` は Google Apps Script からの注文取込APIを認証する共有シークレットです。GitHubには実値を書かないでください。
+`GOOGLE_FORM_RESPONSE_SHEET_URL` は `/admin` のGoogleフォーム取込状況から、回答先スプレッドシートを開くためのURLです。例: `https://docs.google.com/spreadsheets/d/xxxxx/edit?gid=xxxxx`
 
 ## Supabase準備
 
