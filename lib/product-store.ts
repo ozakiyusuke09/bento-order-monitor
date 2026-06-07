@@ -130,15 +130,18 @@ export async function updateProduct(id: string, input: ProductInput) {
   if (!name) throw new Error("商品名を入力してください。");
 
   if (hasSupabaseEnv && supabase) {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("products")
       .update({
         name,
         display_order: input.display_order,
         is_active: input.is_active
       })
-      .eq("id", id);
+      .eq("id", id)
+      .select("id")
+      .maybeSingle();
     if (error) throw error;
+    if (!data) throw new Error("保存対象の商品がDBにありません。初期商品を追加してから保存してください。");
     return;
   }
 

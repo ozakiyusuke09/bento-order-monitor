@@ -130,9 +130,11 @@ function ProductRow({
   const [displayOrder, setDisplayOrder] = useState(String(product.display_order));
   const [isActive, setIsActive] = useState(product.is_active);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function save() {
     setSaving(true);
+    setError(null);
     try {
       await updateProduct(product.id, {
         name,
@@ -140,47 +142,52 @@ function ProductRow({
         is_active: isActive
       });
       await onSaved();
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "商品の保存に失敗しました。");
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <div className="grid grid-cols-[minmax(120px,1fr)_58px_68px_38px] gap-1.5 px-2 py-2 sm:grid-cols-[minmax(0,1fr)_92px_90px_86px] sm:gap-2 sm:px-3">
-      <input
-        value={name}
-        onChange={(event) => setName(event.target.value)}
-        className="h-9 min-w-0 rounded-md border border-slate-200 px-2 text-sm font-semibold outline-none focus:border-slate-400"
-      />
-      <input
-        type="number"
-        min={0}
-        inputMode="numeric"
-        value={displayOrder}
-        onChange={(event) => setDisplayOrder(event.target.value)}
-        className="h-9 min-w-0 rounded-md border border-slate-200 px-2 text-center text-sm font-semibold outline-none focus:border-slate-400"
-      />
-      <button
-        type="button"
-        onClick={() => setIsActive((current) => !current)}
-        className={
-          isActive
-            ? "h-9 rounded-md border border-green-200 bg-green-50 text-xs font-black text-green-700"
-            : "h-9 rounded-md border border-slate-200 bg-slate-50 text-xs font-black text-slate-500"
-        }
-      >
-        {isActive ? "有効" : "無効"}
-      </button>
-      <button
-        type="button"
-        onClick={save}
-        disabled={saving || !name.trim()}
-        aria-label="保存"
-        title="保存"
-        className="inline-flex h-9 min-w-0 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-60"
-      >
-        <Save className="h-4 w-4" />
-      </button>
+    <div className="px-2 py-2 sm:px-3">
+      <div className="grid grid-cols-[minmax(120px,1fr)_58px_68px_38px] gap-1.5 sm:grid-cols-[minmax(0,1fr)_92px_90px_86px] sm:gap-2">
+        <input
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          className="h-9 min-w-0 rounded-md border border-slate-200 px-2 text-sm font-semibold outline-none focus:border-slate-400"
+        />
+        <input
+          type="number"
+          min={0}
+          inputMode="numeric"
+          value={displayOrder}
+          onChange={(event) => setDisplayOrder(event.target.value)}
+          className="h-9 min-w-0 rounded-md border border-slate-200 px-2 text-center text-sm font-semibold outline-none focus:border-slate-400"
+        />
+        <button
+          type="button"
+          onClick={() => setIsActive((current) => !current)}
+          className={
+            isActive
+              ? "h-9 rounded-md border border-green-200 bg-green-50 text-xs font-black text-green-700"
+              : "h-9 rounded-md border border-slate-200 bg-slate-50 text-xs font-black text-slate-500"
+          }
+        >
+          {isActive ? "有効" : "無効"}
+        </button>
+        <button
+          type="button"
+          onClick={save}
+          disabled={saving || !name.trim()}
+          aria-label="保存"
+          title="保存"
+          className="inline-flex h-9 min-w-0 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+        >
+          <Save className="h-4 w-4" />
+        </button>
+      </div>
+      {error ? <div className="mt-2 rounded-md bg-red-50 px-2 py-1.5 text-xs font-bold text-red-700">{error}</div> : null}
     </div>
   );
 }

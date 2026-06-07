@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { productChoices } from "@/lib/constants";
 import { getProducts, subscribeToProductChanges } from "@/lib/product-store";
+import { hasSupabaseEnv } from "@/lib/supabase";
 import type { Product } from "@/lib/types";
 
 function fallbackProducts(): Product[] {
@@ -25,7 +26,7 @@ export function useProducts() {
   async function load() {
     try {
       const nextProducts = await getProducts();
-      setProducts(nextProducts.length ? nextProducts : fallbackProducts());
+      setProducts(nextProducts.length || hasSupabaseEnv ? nextProducts : fallbackProducts());
       setError(null);
     } catch (caught) {
       console.error(caught);
