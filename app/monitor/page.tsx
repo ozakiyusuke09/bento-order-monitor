@@ -180,13 +180,13 @@ export default function MonitorPage() {
               </div>
 
               <section className="min-h-0 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04]">
-                <div className="grid grid-cols-[86px_minmax(96px,1fr)_minmax(220px,2fr)_64px_74px_minmax(110px,1fr)] gap-3 border-b border-white/10 bg-white/[0.04] px-3 py-2 text-[clamp(0.8rem,1vw,0.95rem)] font-black text-slate-300 xl:grid-cols-[96px_1fr_2.05fr_78px_92px_1fr]">
+                <div className="grid grid-cols-[86px_minmax(110px,0.9fr)_minmax(180px,1.55fr)_58px_68px_minmax(180px,1.35fr)] gap-3 border-b border-white/10 bg-white/[0.04] px-3 py-2 text-[clamp(0.8rem,1vw,0.95rem)] font-black text-slate-300 xl:grid-cols-[96px_minmax(124px,0.9fr)_minmax(220px,1.8fr)_70px_82px_minmax(220px,1.45fr)]">
                   <div>時間</div>
-                  <div>注文者</div>
+                  <div>注文者/電話</div>
                   <div>商品</div>
                   <div>数量</div>
                   <div>受取</div>
-                  <div>備考</div>
+                  <div>連絡・備考</div>
                 </div>
                 <div className="monitor-scroll h-full overflow-auto">
                   {orders.slice(0, 14).map((order) => (
@@ -307,10 +307,17 @@ function MonitorOrderRow({ order, flash, today }: { order: OrderWithRelations; f
   const quantity = order.items.reduce((sum, item) => sum + item.quantity, 0);
   const isAlert = order.status === "new" || flash;
   const overdue = order.pickup_date < today && order.status !== "completed" && order.status !== "cancelled";
+  const isDelivery = order.receive_type === "delivery";
+  const contactText = order.phone || "電話番号なし";
+  const destinationText = isDelivery ? order.delivery_address || "住所未入力" : "";
+  const mainInfoText = isDelivery ? destinationText : order.note || "-";
+  const subInfoText = isDelivery && order.note ? `備考：${order.note}` : "";
 
   return (
-    <div
-      className={`grid grid-cols-[86px_minmax(96px,1fr)_minmax(220px,2fr)_64px_74px_minmax(110px,1fr)] items-center gap-3 border-b border-white/10 px-3 py-2.5 xl:grid-cols-[96px_1fr_2.05fr_78px_92px_1fr] ${
+    <Link
+      href={`/orders/${order.id}`}
+      aria-label={`${order.customer_name}の注文詳細を開く`}
+      className={`grid cursor-pointer grid-cols-[86px_minmax(110px,0.9fr)_minmax(180px,1.55fr)_58px_68px_minmax(180px,1.35fr)] items-center gap-3 border-b border-white/10 px-3 py-2.5 transition hover:bg-white/[0.06] focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-300 xl:grid-cols-[96px_minmax(124px,0.9fr)_minmax(220px,1.8fr)_70px_82px_minmax(220px,1.45fr)] ${
         overdue ? "bg-red-600/20" : isAlert ? "bg-red-500/10" : ""
       }`}
     >
@@ -321,16 +328,29 @@ function MonitorOrderRow({ order, flash, today }: { order: OrderWithRelations; f
       </div>
       <div className="min-w-0">
         <div className="truncate text-[clamp(1rem,1.25vw,1.18rem)] font-black text-white">{order.customer_name}</div>
+        <div className="mt-0.5 truncate text-[clamp(0.74rem,0.92vw,0.86rem)] font-black text-slate-300">{contactText}</div>
         {overdue ? <div className="mt-1 inline-flex rounded bg-red-600 px-1.5 py-0.5 text-[0.68rem] font-black leading-none text-white">日付超過・要対応</div> : null}
       </div>
       <MonitorItemBreakdown order={order} />
       <div className="text-[clamp(1rem,1.3vw,1.2rem)] font-black text-white">x {quantity}</div>
       <div className="text-[clamp(1rem,1.2vw,1.15rem)] font-black text-slate-100">{receiveTypeLabels[order.receive_type]}</div>
       <div className="flex min-w-0 items-center justify-between gap-2">
-        <div className="truncate text-[clamp(0.94rem,1.15vw,1.08rem)] font-bold text-slate-300">{order.note || order.delivery_address || "-"}</div>
+        <div className="min-w-0">
+          <div
+            className={`truncate text-[clamp(0.88rem,1.08vw,1rem)] font-black ${isDelivery ? "text-violet-100" : "text-slate-300"}`}
+            title={mainInfoText}
+          >
+            {isDelivery ? `配達先：${mainInfoText}` : mainInfoText}
+          </div>
+          {subInfoText ? (
+            <div className="mt-0.5 truncate text-[clamp(0.72rem,0.88vw,0.82rem)] font-bold text-amber-200" title={order.note || undefined}>
+              {subInfoText}
+            </div>
+          ) : null}
+        </div>
         <StatusBadge status={order.status} strong />
       </div>
-    </div>
+    </Link>
   );
 }
 

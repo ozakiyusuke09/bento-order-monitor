@@ -92,6 +92,7 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
                       value={paymentMethodLabels[order.payment_method as keyof typeof paymentMethodLabels] ?? order.payment_method}
                     />
                     <Info label="登録元" value={order.source} />
+                    <Info label="登録日時" value={displayDateTime(order.created_at)} />
                     {order.delivery_address ? <Info label="配達先" value={order.delivery_address} wide /> : null}
                     {order.note ? <Info label="備考" value={order.note} wide /> : null}
                   </div>
